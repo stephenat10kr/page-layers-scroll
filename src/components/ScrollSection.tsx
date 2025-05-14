@@ -1,5 +1,5 @@
 
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { cn } from "@/lib/utils";
 
 interface SectionProps {
@@ -20,7 +20,7 @@ const ScrollSection = ({ section, isActive, index, activeIndex }: SectionProps) 
   // Calculate the offset based on how far we are from the active section
   const offset = index - activeIndex;
   
-  // Only visible when it's the active section or the next section
+  // Only visible when it's the active section, the one before, or the one after
   const isVisible = offset >= -1 && offset <= 1;
   
   // Calculate opacity and transform based on the offset
@@ -43,12 +43,14 @@ const ScrollSection = ({ section, isActive, index, activeIndex }: SectionProps) 
       className={cn(
         "absolute inset-0 w-full h-full flex items-center justify-center transition-all duration-1000 ease-in-out",
         section.color,
-        isVisible ? "" : "hidden"
+        isVisible ? "opacity-100" : "opacity-0 pointer-events-none"
       )}
       style={{ 
-        opacity,
-        transform
+        opacity: isVisible ? opacity : 0,
+        transform,
+        visibility: isVisible ? "visible" : "hidden"
       }}
+      aria-hidden={!isVisible}
     >
       <div className="max-w-3xl mx-auto text-center p-8 bg-white/90 backdrop-blur-sm rounded-xl shadow-xl">
         <h2 className="text-4xl font-bold mb-4">{section.title}</h2>
