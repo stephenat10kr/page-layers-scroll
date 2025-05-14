@@ -1,3 +1,4 @@
+
 import { useEffect, useRef, useState } from "react";
 import Hero from "@/components/Hero";
 import ScrollSection from "@/components/ScrollSection";
@@ -38,7 +39,7 @@ const Index = () => {
       const scrollContainer = scrollContainerRef.current;
       const { top, height, bottom } = scrollContainer.getBoundingClientRect();
       const scrollPosition = -top;
-      const singleSectionHeight = 100; // Each section transition takes 100vh
+      const sectionHeight = height / 4; // Divide by 4 instead of 3 for the extra scroll
       const viewportHeight = window.innerHeight;
       
       if (scrollPosition < 0) return;
@@ -47,29 +48,27 @@ const Index = () => {
       const isLeavingViewport = bottom < viewportHeight && bottom > 0;
       setIsExiting(isLeavingViewport);
       
-      // Calculate which section is active based on the new transitions
+      // Calculate which section is active
       let currentSection;
-      let progress;
-      
-      if (scrollPosition >= 300) {
-        // Beyond 300vh, we're in the exit transition
-        currentSection = 2; // Keep section 3 active during exit
-        
-        if (isLeavingViewport) {
-          // Calculate exit transition progress (0 -> 1 as section leaves)
-          progress = Math.pow(1 - (bottom / viewportHeight), 2);
-        } else {
-          // Still in the container but beyond 300vh
-          progress = Math.min((scrollPosition - 300) / 100, 1);
-        }
+      if (scrollPosition >= sectionHeight * 3) {
+        currentSection = 2; // Keep section 3 (index 2) active for the last section
       } else {
-        // We're within the main transitions (0-300vh)
-        currentSection = Math.min(Math.floor(scrollPosition / 100), 2);
-        
-        // Calculate transition progress within current section (0-1)
-        const sectionScrollStart = currentSection * 100;
-        const rawProgress = (scrollPosition - sectionScrollStart) / 100;
-        
+        currentSection = Math.min(
+          Math.floor(scrollPosition / sectionHeight),
+          sections.length - 1
+        );
+      }
+      
+      // Calculate transition progress with easing for smoother transitions
+      let progress;
+      if (isLeavingViewport) {
+        // Calculate exit transition progress (0 -> 1 as section leaves)
+        // Make this transition more gradual
+        progress = Math.pow(1 - (bottom / viewportHeight), 2);
+      } else {
+        // Normal section transition progress with ease-in-out
+        const sectionStart = currentSection * sectionHeight;
+        const rawProgress = (scrollPosition - sectionStart) / sectionHeight;
         // Apply ease-in-out smoothing
         progress = rawProgress < 0.5 
           ? 2 * rawProgress * rawProgress 
@@ -92,7 +91,7 @@ const Index = () => {
       {/* Normal scrolling section at top */}
       <Hero />
       
-      {/* Scroll-jacked section - maintained at 400vh */}
+      {/* Scroll-jacked section - increased from 300vh to 400vh */}
       <div 
         ref={scrollContainerRef}
         className="h-[400vh] relative"
