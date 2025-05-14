@@ -23,6 +23,7 @@ const AnimatedBackground = ({ scrollY, activeSection, transitionProgress }: Anim
     { a: 1.0, b: 1.0, n: 1.0, m: 2.0 },   // Section 1
     { a: 3.0, b: -2.0, n: 2.5, m: 3.5 },  // Section 2
     { a: -4.0, b: 4.0, n: 4.0, m: 4.6 },  // Section 3
+    { a: 5.0, b: -4.5, n: 6.0, m: 3.0 },  // Final pattern (Section 3 end state)
   ];
 
   // Linear interpolation function to blend between values
@@ -33,7 +34,42 @@ const AnimatedBackground = ({ scrollY, activeSection, transitionProgress }: Anim
   // Get interpolated configuration between current and next section
   const getInterpolatedConfig = () => {
     const currentConfig = patternConfigs[activeSection];
-    const nextConfig = patternConfigs[Math.min(activeSection + 1, patternConfigs.length - 1)];
+    
+    // For the last section with extended transition
+    if (activeSection === 2) {
+      const finalConfig = patternConfigs[3]; // The final pattern
+      
+      // If transitionProgress is between 0-1, interpolate between section 3 start and middle
+      // If between 1-2, interpolate between section 3 middle and final pattern
+      if (transitionProgress <= 1) {
+        // First half of section 3 transition
+        return {
+          a: lerp(currentConfig.a, (currentConfig.a + finalConfig.a) / 2, transitionProgress),
+          b: lerp(currentConfig.b, (currentConfig.b + finalConfig.b) / 2, transitionProgress),
+          n: lerp(currentConfig.n, (currentConfig.n + finalConfig.n) / 2, transitionProgress),
+          m: lerp(currentConfig.m, (currentConfig.m + finalConfig.m) / 2, transitionProgress),
+        };
+      } else {
+        // Second half of section 3 transition
+        const adjustedProgress = transitionProgress - 1; // Convert 1-2 to 0-1
+        const midConfig = {
+          a: (currentConfig.a + finalConfig.a) / 2,
+          b: (currentConfig.b + finalConfig.b) / 2,
+          n: (currentConfig.n + finalConfig.n) / 2,
+          m: (currentConfig.m + finalConfig.m) / 2,
+        };
+        
+        return {
+          a: lerp(midConfig.a, finalConfig.a, adjustedProgress),
+          b: lerp(midConfig.b, finalConfig.b, adjustedProgress),
+          n: lerp(midConfig.n, finalConfig.n, adjustedProgress),
+          m: lerp(midConfig.m, finalConfig.m, adjustedProgress),
+        };
+      }
+    }
+    
+    // For other sections, normal transition to the next section
+    const nextConfig = patternConfigs[Math.min(activeSection + 1, patternConfigs.length - 2)];
     
     return {
       a: lerp(currentConfig.a, nextConfig.a, transitionProgress),

@@ -38,14 +38,14 @@ const Index = () => {
       const scrollContainer = scrollContainerRef.current;
       const { top, height } = scrollContainer.getBoundingClientRect();
       const scrollPosition = -top;
-      const sectionHeight = height / 4; // Divide by 4 instead of 3 for the extra scroll
+      const sectionHeight = height / 5; // Divide by 5 instead of 4 for the 500vh scroll
       
       if (scrollPosition < 0) return;
       
-      // Keep section 3 active during the last 100vh of scroll
+      // Determine current active section
       let currentSection;
       if (scrollPosition >= sectionHeight * 3) {
-        currentSection = 2; // Keep section 3 (index 2) active for the last section
+        currentSection = 2; // Keep section 3 (index 2) active for the last sections
       } else {
         currentSection = Math.min(
           Math.floor(scrollPosition / sectionHeight),
@@ -54,9 +54,18 @@ const Index = () => {
       }
       
       // Calculate transition progress between sections (0 to 1)
-      const sectionStart = currentSection * sectionHeight;
-      const progressWithinSection = (scrollPosition - sectionStart) / sectionHeight;
-      setTransitionProgress(Math.max(0, Math.min(1, progressWithinSection)));
+      let progress;
+      if (currentSection < 2) {
+        // For sections 0 and 1, normal transition (0-1)
+        const sectionStart = currentSection * sectionHeight;
+        progress = (scrollPosition - sectionStart) / sectionHeight;
+      } else {
+        // For section 2 (index 2), extended transition (0-2) over the last 200vh
+        const sectionStart = 2 * sectionHeight; // Start of section 3
+        progress = (scrollPosition - sectionStart) / (sectionHeight * 2); // Progress over 2 section heights
+      }
+      
+      setTransitionProgress(Math.max(0, Math.min(2, progress))); // Allow progress to go up to 2 for extended transition
       
       if (currentSection >= 0 && currentSection < sections.length) {
         setActiveSection(currentSection);
@@ -72,10 +81,10 @@ const Index = () => {
       {/* Normal scrolling section at top */}
       <Hero />
       
-      {/* Scroll-jacked section - increased from 300vh to 400vh */}
+      {/* Scroll-jacked section - increased from 400vh to 500vh */}
       <div 
         ref={scrollContainerRef}
-        className="h-[400vh] relative"
+        className="h-[500vh] relative"
       >
         <div className="sticky top-0 h-screen overflow-hidden flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
           {/* WebGL animated background */}
