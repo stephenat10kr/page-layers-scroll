@@ -1,20 +1,16 @@
 
 import { useEffect, useRef } from 'react';
-import { createShader, createProgram, vertexShaderSource, fragmentShaderSource, lerp } from '../utils/shaderUtils';
-import { getInterpolatedConfig } from '../utils/patternConfigs';
+import { createShader, createProgram, vertexShaderSource, fragmentShaderSource } from '../utils/shaderUtils';
+import { getInterpolatedConfigFromProgress } from '../utils/patternConfigs';
 
 interface UseWebGLCanvasProps {
-  activeSection: number;
-  transitionProgress: number;
+  normalizedScrollProgress: number;
   normalizedScrollX: number;
-  normalizedScrollY: number;
 }
 
 export const useWebGLCanvas = ({
-  activeSection,
-  transitionProgress,
-  normalizedScrollX,
-  normalizedScrollY
+  normalizedScrollProgress,
+  normalizedScrollX
 }: UseWebGLCanvasProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameRef = useRef<number | null>(null);
@@ -78,12 +74,12 @@ export const useWebGLCanvas = ({
       
       const time = (Date.now() - startTime) * 0.001;
       
-      // Get interpolated pattern configuration
-      const config = getInterpolatedConfig(activeSection, transitionProgress);
+      // Get interpolated pattern configuration based on single normalized scroll progress
+      const config = getInterpolatedConfigFromProgress(normalizedScrollProgress);
       
       gl.uniform1f(timeLocation, time);
       gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
-      gl.uniform2f(xyLocation, normalizedScrollX, normalizedScrollY);
+      gl.uniform2f(xyLocation, normalizedScrollX, normalizedScrollProgress);
       
       // Pass interpolated parameters to shader
       gl.uniform1f(aParamLocation, config.a);
@@ -109,7 +105,7 @@ export const useWebGLCanvas = ({
       gl.deleteShader(vertexShader);
       gl.deleteShader(fragmentShader);
     };
-  }, [activeSection, transitionProgress, normalizedScrollX, normalizedScrollY]);
+  }, [normalizedScrollProgress, normalizedScrollX]);
   
   return { canvasRef };
 };

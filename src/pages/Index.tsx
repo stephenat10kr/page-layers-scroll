@@ -6,9 +6,8 @@ import Footer from "@/components/Footer";
 import AnimatedBackground from "@/components/AnimatedBackground";
 
 const Index = () => {
-  const [activeSection, setActiveSection] = useState(0);
+  const [normalizedScrollProgress, setNormalizedScrollProgress] = useState(0);
   const [scrollY, setScrollY] = useState(0);
-  const [transitionProgress, setTransitionProgress] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const sections = [
     {
@@ -25,6 +24,11 @@ const Index = () => {
       id: "section3",
       title: "Section Three",
       description: "The third section with its own distinct animation pattern."
+    },
+    {
+      id: "section4",
+      title: "Section Four",
+      description: "The final section before reaching the footer."
     }
   ];
 
@@ -38,47 +42,46 @@ const Index = () => {
       const scrollContainer = scrollContainerRef.current;
       const { top, height } = scrollContainer.getBoundingClientRect();
       const scrollPosition = -top;
-      const sectionHeight = height / 3; // 3 sections, each 100vh tall (total 300vh)
       
       if (scrollPosition < 0) return;
       
-      // Determine current active section (0 to 2)
+      // Calculate a single normalized scroll progress (0 to 1)
+      const progress = Math.max(0, Math.min(1, scrollPosition / height));
+      setNormalizedScrollProgress(progress);
+      
+      // For section visibility, we still need to know the active section
+      const sectionHeight = height / 4; // 4 sections (0-400vh)
       const currentSection = Math.min(
         Math.floor(scrollPosition / sectionHeight),
         sections.length - 1
       );
       
-      // Calculate transition progress between sections (0 to 1)
-      const sectionStart = currentSection * sectionHeight;
-      const progress = (scrollPosition - sectionStart) / sectionHeight;
-      
-      setTransitionProgress(Math.max(0, Math.min(1, progress)));
-      
-      if (currentSection >= 0 && currentSection < sections.length) {
-        setActiveSection(currentSection);
-      }
+      // Update active section for rendering content
+      setActiveSection(currentSection);
     };
     
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, [sections.length]);
+  
+  // We still need activeSection for content display purposes
+  const [activeSection, setActiveSection] = useState(0);
 
   return (
     <div className="min-h-screen flex flex-col">
       {/* Normal scrolling section at top */}
       <Hero />
       
-      {/* Scroll-jacked section - 300vh total, 100vh per section */}
+      {/* Scroll-jacked section - 400vh total, 100vh per section */}
       <div 
         ref={scrollContainerRef}
-        className="h-[300vh] relative"
+        className="h-[400vh] relative"
       >
         <div className="sticky top-0 h-screen overflow-hidden flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
-          {/* WebGL animated background */}
+          {/* WebGL animated background - now only using normalizedScrollProgress */}
           <AnimatedBackground 
             scrollY={scrollY} 
-            activeSection={activeSection}
-            transitionProgress={transitionProgress}
+            normalizedScrollProgress={normalizedScrollProgress}
           />
           
           {/* Pattern overlay */}
