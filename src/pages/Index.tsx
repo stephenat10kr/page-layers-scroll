@@ -45,7 +45,7 @@ const Index = () => {
       setNormalizedScrollProgress(progress);
       
       // For section visibility, we still need to know the active section
-      const sectionHeight = height / 3; // 3 sections (0-300vh) instead of 4
+      const sectionHeight = height / 3; // 3 sections sharing 400vh total height
       const currentSection = Math.min(
         Math.floor(scrollPosition / sectionHeight),
         sections.length - 1
@@ -67,10 +67,10 @@ const Index = () => {
       {/* Normal scrolling section at top */}
       <Hero />
       
-      {/* Scroll-jacked section - 300vh total, 100vh per section */}
+      {/* Scroll-jacked section - 400vh total, with 3 sections */}
       <div 
         ref={scrollContainerRef}
-        className="h-[300vh] relative"
+        className="h-[400vh] relative"
       >
         <div className="sticky top-0 h-screen overflow-hidden flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
           {/* WebGL animated background - now only using normalizedScrollProgress */}
