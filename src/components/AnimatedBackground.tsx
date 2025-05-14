@@ -22,8 +22,7 @@ const AnimatedBackground = ({ scrollY, activeSection, transitionProgress }: Anim
   const patternConfigs: PatternConfig[] = [
     { a: 1.0, b: 1.0, n: 1.0, m: 2.0 },   // Section 1
     { a: 3.0, b: -2.0, n: 2.5, m: 3.5 },  // Section 2
-    { a: -4.0, b: 4.0, n: 4.0, m: 4.6 },  // Section 3 start
-    { a: -2.0, b: 2.0, n: 5.0, m: 5.6 },  // Section 3 end (after extra 100vh scroll)
+    { a: -4.0, b: 4.0, n: 4.0, m: 4.6 },  // Section 3
   ];
 
   // Linear interpolation function to blend between values
@@ -33,40 +32,15 @@ const AnimatedBackground = ({ scrollY, activeSection, transitionProgress }: Anim
 
   // Get interpolated configuration between current and next section
   const getInterpolatedConfig = () => {
-    // Handle the extended transition for section 3
-    if (activeSection === 2) {
-      // For the first half of the extended transition (0-1)
-      if (transitionProgress <= 1) {
-        return {
-          a: lerp(patternConfigs[2].a, patternConfigs[3].a, transitionProgress),
-          b: lerp(patternConfigs[2].b, patternConfigs[3].b, transitionProgress),
-          n: lerp(patternConfigs[2].n, patternConfigs[3].n, transitionProgress),
-          m: lerp(patternConfigs[2].m, patternConfigs[3].m, transitionProgress),
-        };
-      } 
-      // For the second half of the extended transition (1-2)
-      else {
-        // Normalize progress to 0-1 range for the second half
-        const normalizedProgress = transitionProgress - 1;
-        return {
-          a: lerp(patternConfigs[3].a, patternConfigs[3].a, normalizedProgress), // Stable a 
-          b: lerp(patternConfigs[3].b, patternConfigs[3].b * 0.5, normalizedProgress), // Decrease b
-          n: lerp(patternConfigs[3].n, patternConfigs[3].n * 1.2, normalizedProgress), // Increase n
-          m: lerp(patternConfigs[3].m, patternConfigs[3].m * 0.8, normalizedProgress), // Decrease m
-        };
-      }
-    } else {
-      // Regular transition for sections 1 and 2
-      const currentConfig = patternConfigs[activeSection];
-      const nextConfig = patternConfigs[Math.min(activeSection + 1, patternConfigs.length - 2)];
-      
-      return {
-        a: lerp(currentConfig.a, nextConfig.a, transitionProgress),
-        b: lerp(currentConfig.b, nextConfig.b, transitionProgress),
-        n: lerp(currentConfig.n, nextConfig.n, transitionProgress),
-        m: lerp(currentConfig.m, nextConfig.m, transitionProgress),
-      };
-    }
+    const currentConfig = patternConfigs[activeSection];
+    const nextConfig = patternConfigs[Math.min(activeSection + 1, patternConfigs.length - 1)];
+    
+    return {
+      a: lerp(currentConfig.a, nextConfig.a, transitionProgress),
+      b: lerp(currentConfig.b, nextConfig.b, transitionProgress),
+      n: lerp(currentConfig.n, nextConfig.n, transitionProgress),
+      m: lerp(currentConfig.m, nextConfig.m, transitionProgress),
+    };
   };
 
   // Normalized scroll position values (0 to 1) - still used for subtle variations
