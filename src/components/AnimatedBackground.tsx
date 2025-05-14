@@ -5,6 +5,7 @@ interface AnimatedBackgroundProps {
   scrollY: number;
   activeSection: number;
   transitionProgress: number;
+  isExiting: boolean;
 }
 
 interface PatternConfig {
@@ -14,7 +15,7 @@ interface PatternConfig {
   m: number;
 }
 
-const AnimatedBackground = ({ scrollY, activeSection, transitionProgress }: AnimatedBackgroundProps) => {
+const AnimatedBackground = ({ scrollY, activeSection, transitionProgress, isExiting }: AnimatedBackgroundProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const shaderRef = useRef<any>(null);
   
@@ -23,6 +24,7 @@ const AnimatedBackground = ({ scrollY, activeSection, transitionProgress }: Anim
     { a: 1.0, b: 1.0, n: 1.0, m: 2.0 },   // Section 1
     { a: 3.0, b: -2.0, n: 2.5, m: 3.5 },  // Section 2
     { a: -4.0, b: 4.0, n: 4.0, m: 4.6 },  // Section 3
+    { a: 0.0, b: 2.0, n: 5.0, m: 2.0 }    // Exit transition configuration
   ];
 
   // Linear interpolation function to blend between values
@@ -32,8 +34,22 @@ const AnimatedBackground = ({ scrollY, activeSection, transitionProgress }: Anim
 
   // Get interpolated configuration between current and next section
   const getInterpolatedConfig = () => {
+    // For the exit transition
+    if (isExiting) {
+      const currentConfig = patternConfigs[patternConfigs.length - 2]; // Section 3
+      const exitConfig = patternConfigs[patternConfigs.length - 1]; // Exit config
+      
+      return {
+        a: lerp(currentConfig.a, exitConfig.a, transitionProgress),
+        b: lerp(currentConfig.b, exitConfig.b, transitionProgress),
+        n: lerp(currentConfig.n, exitConfig.n, transitionProgress),
+        m: lerp(currentConfig.m, exitConfig.m, transitionProgress),
+      };
+    }
+    
+    // Normal section transitions
     const currentConfig = patternConfigs[activeSection];
-    const nextConfig = patternConfigs[Math.min(activeSection + 1, patternConfigs.length - 1)];
+    const nextConfig = patternConfigs[Math.min(activeSection + 1, patternConfigs.length - 2)];
     
     return {
       a: lerp(currentConfig.a, nextConfig.a, transitionProgress),
@@ -176,7 +192,7 @@ const AnimatedBackground = ({ scrollY, activeSection, transitionProgress }: Anim
         cancelAnimationFrame(shaderRef.current);
       }
     };
-  }, [activeSection, transitionProgress, normalizedScrollX, normalizedScrollY]);
+  }, [activeSection, transitionProgress, normalizedScrollX, normalizedScrollY, isExiting]);
 
   return (
     <canvas 

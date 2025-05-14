@@ -9,6 +9,7 @@ const Index = () => {
   const [activeSection, setActiveSection] = useState(0);
   const [scrollY, setScrollY] = useState(0);
   const [transitionProgress, setTransitionProgress] = useState(0);
+  const [isExiting, setIsExiting] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const sections = [
     {
@@ -36,13 +37,18 @@ const Index = () => {
       setScrollY(window.scrollY);
       
       const scrollContainer = scrollContainerRef.current;
-      const { top, height } = scrollContainer.getBoundingClientRect();
+      const { top, height, bottom } = scrollContainer.getBoundingClientRect();
       const scrollPosition = -top;
       const sectionHeight = height / 4; // Divide by 4 instead of 3 for the extra scroll
+      const viewportHeight = window.innerHeight;
       
       if (scrollPosition < 0) return;
       
-      // Keep section 3 active during the last 100vh of scroll
+      // Check if we're in exit transition (section is starting to leave viewport)
+      const isLeavingViewport = bottom < viewportHeight && bottom > 0;
+      setIsExiting(isLeavingViewport);
+      
+      // Calculate which section is active
       let currentSection;
       if (scrollPosition >= sectionHeight * 3) {
         currentSection = 2; // Keep section 3 (index 2) active for the last section
@@ -53,10 +59,18 @@ const Index = () => {
         );
       }
       
-      // Calculate transition progress between sections (0 to 1)
-      const sectionStart = currentSection * sectionHeight;
-      const progressWithinSection = (scrollPosition - sectionStart) / sectionHeight;
-      setTransitionProgress(Math.max(0, Math.min(1, progressWithinSection)));
+      // Calculate transition progress
+      let progress;
+      if (isLeavingViewport) {
+        // Calculate exit transition progress (0 -> 1 as section leaves)
+        progress = 1 - (bottom / viewportHeight);
+      } else {
+        // Normal section transition progress
+        const sectionStart = currentSection * sectionHeight;
+        progress = (scrollPosition - sectionStart) / sectionHeight;
+      }
+      
+      setTransitionProgress(Math.max(0, Math.min(1, progress)));
       
       if (currentSection >= 0 && currentSection < sections.length) {
         setActiveSection(currentSection);
@@ -83,6 +97,7 @@ const Index = () => {
             scrollY={scrollY} 
             activeSection={activeSection}
             transitionProgress={transitionProgress}
+            isExiting={isExiting}
           />
           
           {/* Pattern overlay */}

@@ -19,7 +19,7 @@ const ScrollSection = ({ section, isActive, index, activeIndex }: SectionProps) 
   // Calculate the offset based on how far we are from the active section
   const offset = index - activeIndex;
   
-  // Only visible when it's the active section or the next section
+  // Only visible when it's the active section or the next/previous section
   const isVisible = offset >= -1 && offset <= 1;
   
   // Calculate opacity and transform based on the offset
