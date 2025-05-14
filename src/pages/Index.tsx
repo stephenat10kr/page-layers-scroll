@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState } from "react";
 import Hero from "@/components/Hero";
 import ScrollSection from "@/components/ScrollSection";
@@ -35,14 +34,20 @@ const Index = () => {
       const scrollContainer = scrollContainerRef.current;
       const { top, height } = scrollContainer.getBoundingClientRect();
       const scrollPosition = -top;
-      const sectionHeight = height / sections.length;
+      const sectionHeight = height / 4; // Divide by 4 instead of 3 for the extra scroll
       
       if (scrollPosition < 0) return;
       
-      const currentSection = Math.min(
-        Math.floor(scrollPosition / sectionHeight),
-        sections.length - 1
-      );
+      // Keep section 3 active during the last 100vh of scroll
+      let currentSection;
+      if (scrollPosition >= sectionHeight * 3) {
+        currentSection = 2; // Keep section 3 (index 2) active for the last section
+      } else {
+        currentSection = Math.min(
+          Math.floor(scrollPosition / sectionHeight),
+          sections.length - 1
+        );
+      }
       
       if (currentSection >= 0 && currentSection < sections.length) {
         setActiveSection(currentSection);
@@ -58,10 +63,10 @@ const Index = () => {
       {/* Normal scrolling section at top */}
       <Hero />
       
-      {/* Scroll-jacked section */}
+      {/* Scroll-jacked section - increased from 300vh to 400vh */}
       <div 
         ref={scrollContainerRef}
-        className="h-[300vh] relative"
+        className="h-[400vh] relative"
       >
         <div className="sticky top-0 h-screen overflow-hidden flex items-center justify-center">
           {sections.map((section, index) => (
