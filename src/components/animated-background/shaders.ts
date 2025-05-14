@@ -21,14 +21,23 @@ export const fragmentShaderSource = `
     const float PI = 3.14159265;
     vec2 p = (2.0 * gl_FragCoord.xy - resolution.xy) / resolution.y;
 
-    // Slow down the time factor for more subtle animation
+    // Base time animation factors
     float tx = sin(time * 0.6)*0.05; 
     float ty = cos(time * 0.6)*0.05; 
+    
+    // Apply conditional time influence for purple transition
+    float timeInfluence = 0.15;  // Default time influence
+    if (transitionSection == 2) {  // Purple transition (Section 3 to Exit)
+      timeInfluence = 0.35;  // Increase animation influence for purple transition
+      // Add a bit more motion variation for this section
+      tx = sin(time * 0.8) * 0.08; 
+      ty = cos(time * 0.7) * 0.08;
+    }
 
-    float a = a_param + tx * 0.15;
-    float b = b_param + tx * 0.15;
-    float n = n_param + ty * 0.15;
-    float m = m_param + ty * 0.15;
+    float a = a_param + tx * timeInfluence;
+    float b = b_param + tx * timeInfluence;
+    float n = n_param + ty * timeInfluence;
+    float m = m_param + ty * timeInfluence;
 
     float max_amp = abs(a) + abs(b);
     float amp = a * sin(PI*n*p.x) * sin(PI*m*p.y) + b * sin(PI*m*p.x) * sin(PI*n*p.y);
