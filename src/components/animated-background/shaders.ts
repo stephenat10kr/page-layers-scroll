@@ -44,12 +44,9 @@ export const fragmentShaderSource = `
     } else if (transitionSection == 1) {
       // Section 2 to 3 transition (green tint)
       finalColor = mix(baseColor, vec3(0.5, 1.0, 0.7), 0.3);
-    } else if (transitionSection == 2) {
-      // Section 3 to Exit transition (purple tint)
-      finalColor = mix(baseColor, vec3(0.8, 0.5, 1.0), 0.3);
     } else {
-      // Default/exit buffer transition (orange tint)
-      finalColor = mix(baseColor, vec3(1.0, 0.7, 0.4), 0.3);
+      // Section 3 or default (neutral gray tint)
+      finalColor = mix(baseColor, vec3(0.8, 0.8, 0.8), 0.3);
     }
     
     gl_FragColor = vec4(finalColor, 1.0);
