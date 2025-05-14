@@ -22,7 +22,7 @@ const WebGLRenderer = ({ scrollY, activeSection, transitionProgress, isExiting }
   // Calculate transition section based on scroll position
   useEffect(() => {
     if (isExiting) {
-      setTransitionSection(3); // Exit buffer - use special animation mode
+      setTransitionSection(3); // Exit buffer
     } else {
       setTransitionSection(activeSection); // Section transitions (0, 1, 2)
     }
@@ -99,10 +99,7 @@ const WebGLRenderer = ({ scrollY, activeSection, transitionProgress, isExiting }
       // Get interpolated pattern configuration
       const config = getInterpolatedConfig(activeSection, transitionProgress, isExiting);
       
-      // Speed up animation slightly when exiting for more visible effect
-      const timeMultiplier = isExiting ? 1.2 : 1.0;
-      
-      gl.uniform1f(timeLocation, time * timeMultiplier);
+      gl.uniform1f(timeLocation, time);
       gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
       gl.uniform2f(xyLocation, normalizedScrollX, normalizedScrollY);
       
@@ -141,7 +138,7 @@ const WebGLRenderer = ({ scrollY, activeSection, transitionProgress, isExiting }
         {transitionSection === 0 && "Section 1→2"}
         {transitionSection === 1 && "Section 2→3"}
         {transitionSection === 2 && "Section 3→Exit"}
-        {transitionSection === 3 && "Exit Transition"}
+        {transitionSection === 3 && "Exit Buffer"}
       </div>
     </>
   );

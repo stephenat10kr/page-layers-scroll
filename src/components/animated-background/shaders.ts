@@ -49,9 +49,7 @@ export const fragmentShaderSource = `
       finalColor = mix(baseColor, vec3(0.8, 0.5, 1.0), 0.3);
     } else {
       // Default/exit buffer transition (orange tint)
-      // Add animated time factor to make the exit animation more visible
-      float exitPulse = sin(time * 2.0) * 0.1 + 0.9;  // Creates a pulsing effect
-      finalColor = mix(baseColor, vec3(1.0, 0.7 * exitPulse, 0.4), 0.3);
+      finalColor = mix(baseColor, vec3(1.0, 0.7, 0.4), 0.3);
     }
     
     gl_FragColor = vec4(finalColor, 1.0);
