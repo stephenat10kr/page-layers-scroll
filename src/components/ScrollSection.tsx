@@ -28,8 +28,8 @@ const ScrollSection = ({ section, isActive, index, activeIndex }: SectionProps) 
   let transform = "translateX(0)";
   
   if (offset > 0) {
-    // Next section(s)
-    opacity = 0.2;
+    // Next section(s) - changing opacity from 0.2 to 0
+    opacity = 0;
     transform = "translateX(50%)";
   } else if (offset < 0) {
     // Previous section(s)
