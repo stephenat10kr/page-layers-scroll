@@ -3,9 +3,11 @@ import { useEffect, useRef, useState } from "react";
 import Hero from "@/components/Hero";
 import ScrollSection from "@/components/ScrollSection";
 import Footer from "@/components/Footer";
+import AnimatedBackground from "@/components/AnimatedBackground";
 
 const Index = () => {
   const [activeSection, setActiveSection] = useState(0);
+  const [scrollPosition, setScrollPosition] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const sections = [
     {
@@ -28,6 +30,9 @@ const Index = () => {
   useEffect(() => {
     const handleScroll = () => {
       if (!scrollContainerRef.current) return;
+      
+      // Update scroll position for the animated background
+      setScrollPosition(window.scrollY);
       
       const scrollContainer = scrollContainerRef.current;
       const { top, height } = scrollContainer.getBoundingClientRect();
@@ -67,6 +72,9 @@ const Index = () => {
         className="h-[400vh] relative"
       >
         <div className="sticky top-0 h-screen overflow-hidden flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
+          {/* Animated WebGL background */}
+          <AnimatedBackground scrollPosition={scrollPosition} />
+          
           {/* Pattern overlay */}
           <div className="absolute inset-0 w-full h-full opacity-20 pointer-events-none">
             <div className="absolute inset-0 w-full h-full" 
