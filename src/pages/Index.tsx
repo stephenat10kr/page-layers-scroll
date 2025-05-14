@@ -24,7 +24,7 @@ const Index = () => {
     {
       id: "section3",
       title: "Section Three",
-      description: "The third section with its own distinct animation pattern."
+      description: "The final section in our scroll-jacked area before continuing to the footer."
     }
   ];
 
@@ -38,21 +38,25 @@ const Index = () => {
       const scrollContainer = scrollContainerRef.current;
       const { top, height } = scrollContainer.getBoundingClientRect();
       const scrollPosition = -top;
-      const sectionHeight = height / 3; // 3 sections, each 100vh tall (total 300vh)
+      const sectionHeight = height / 4; // Divide by 4 instead of 3 for the extra scroll
       
       if (scrollPosition < 0) return;
       
-      // Determine current active section (0 to 2)
-      const currentSection = Math.min(
-        Math.floor(scrollPosition / sectionHeight),
-        sections.length - 1
-      );
+      // Keep section 3 active during the last 100vh of scroll
+      let currentSection;
+      if (scrollPosition >= sectionHeight * 3) {
+        currentSection = 2; // Keep section 3 (index 2) active for the last section
+      } else {
+        currentSection = Math.min(
+          Math.floor(scrollPosition / sectionHeight),
+          sections.length - 1
+        );
+      }
       
       // Calculate transition progress between sections (0 to 1)
       const sectionStart = currentSection * sectionHeight;
-      const progress = (scrollPosition - sectionStart) / sectionHeight;
-      
-      setTransitionProgress(Math.max(0, Math.min(1, progress)));
+      const progressWithinSection = (scrollPosition - sectionStart) / sectionHeight;
+      setTransitionProgress(Math.max(0, Math.min(1, progressWithinSection)));
       
       if (currentSection >= 0 && currentSection < sections.length) {
         setActiveSection(currentSection);
@@ -68,10 +72,10 @@ const Index = () => {
       {/* Normal scrolling section at top */}
       <Hero />
       
-      {/* Scroll-jacked section - 300vh total, 100vh per section */}
+      {/* Scroll-jacked section - increased from 300vh to 400vh */}
       <div 
         ref={scrollContainerRef}
-        className="h-[300vh] relative"
+        className="h-[400vh] relative"
       >
         <div className="sticky top-0 h-screen overflow-hidden flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
           {/* WebGL animated background */}
