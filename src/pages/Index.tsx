@@ -59,15 +59,20 @@ const Index = () => {
         );
       }
       
-      // Calculate transition progress
+      // Calculate transition progress with easing for smoother transitions
       let progress;
       if (isLeavingViewport) {
         // Calculate exit transition progress (0 -> 1 as section leaves)
-        progress = 1 - (bottom / viewportHeight);
+        // Make this transition more gradual
+        progress = Math.pow(1 - (bottom / viewportHeight), 2);
       } else {
-        // Normal section transition progress
+        // Normal section transition progress with ease-in-out
         const sectionStart = currentSection * sectionHeight;
-        progress = (scrollPosition - sectionStart) / sectionHeight;
+        const rawProgress = (scrollPosition - sectionStart) / sectionHeight;
+        // Apply ease-in-out smoothing
+        progress = rawProgress < 0.5 
+          ? 2 * rawProgress * rawProgress 
+          : 1 - Math.pow(-2 * rawProgress + 2, 2) / 2;
       }
       
       setTransitionProgress(Math.max(0, Math.min(1, progress)));

@@ -19,17 +19,19 @@ const AnimatedBackground = ({ scrollY, activeSection, transitionProgress, isExit
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const shaderRef = useRef<any>(null);
   
-  // Define pattern configurations for each section
+  // Define pattern configurations for each section with subtler differences
   const patternConfigs: PatternConfig[] = [
     { a: 1.0, b: 1.0, n: 1.0, m: 2.0 },   // Section 1
-    { a: 3.0, b: -2.0, n: 2.5, m: 3.5 },  // Section 2
-    { a: -4.0, b: 4.0, n: 4.0, m: 4.6 },  // Section 3
-    { a: 0.0, b: 2.0, n: 5.0, m: 2.0 }    // Exit transition configuration
+    { a: 2.0, b: -1.5, n: 2.0, m: 3.0 },  // Section 2 - reduced differences
+    { a: -3.0, b: 3.0, n: 3.0, m: 4.0 },  // Section 3 - reduced differences
+    { a: 0.0, b: 1.5, n: 3.5, m: 2.0 }    // Exit transition configuration - smoothed
   ];
 
   // Linear interpolation function to blend between values
   const lerp = (start: number, end: number, t: number) => {
-    return start * (1 - t) + end * t;
+    // Apply easing for smoother transitions
+    const easedT = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+    return start * (1 - easedT) + end * easedT;
   };
 
   // Get interpolated configuration between current and next section
@@ -106,13 +108,14 @@ const AnimatedBackground = ({ scrollY, activeSection, transitionProgress, isExit
         const float PI = 3.14159265;
         vec2 p = (2.0 * gl_FragCoord.xy - resolution.xy) / resolution.y;
 
-        float tx = sin(time)*0.1; 
-        float ty = cos(time)*0.1; 
+        // Slow down the time factor for more subtle animation
+        float tx = sin(time * 0.6)*0.05; 
+        float ty = cos(time * 0.6)*0.05; 
 
-        float a = a_param + tx * 0.2;
-        float b = b_param + tx * 0.2;
-        float n = n_param + ty * 0.2;
-        float m = m_param + ty * 0.2;
+        float a = a_param + tx * 0.15;
+        float b = b_param + tx * 0.15;
+        float n = n_param + ty * 0.15;
+        float m = m_param + ty * 0.15;
 
         float max_amp = abs(a) + abs(b);
         float amp = a * sin(PI*n*p.x) * sin(PI*m*p.y) + b * sin(PI*m*p.x) * sin(PI*n*p.y);
