@@ -9,23 +9,10 @@ export const lerp = (start: number, end: number, t: number) => {
 };
 
 // Get interpolated configuration between current and next section
-export const getInterpolatedConfig = (activeSection: number, transitionProgress: number, isExiting: boolean) => {
-  // For the exit transition
-  if (isExiting) {
-    const currentConfig = patternConfigs[patternConfigs.length - 2]; // Section 3
-    const exitConfig = patternConfigs[patternConfigs.length - 1]; // Exit config
-    
-    return {
-      a: lerp(currentConfig.a, exitConfig.a, transitionProgress),
-      b: lerp(currentConfig.b, exitConfig.b, transitionProgress),
-      n: lerp(currentConfig.n, exitConfig.n, transitionProgress),
-      m: lerp(currentConfig.m, exitConfig.m, transitionProgress),
-    };
-  }
-  
+export const getInterpolatedConfig = (activeSection: number, transitionProgress: number) => {
   // Normal section transitions
   const currentConfig = patternConfigs[activeSection];
-  const nextConfig = patternConfigs[Math.min(activeSection + 1, patternConfigs.length - 2)];
+  const nextConfig = patternConfigs[Math.min(activeSection + 1, patternConfigs.length - 1)];
   
   return {
     a: lerp(currentConfig.a, nextConfig.a, transitionProgress),
