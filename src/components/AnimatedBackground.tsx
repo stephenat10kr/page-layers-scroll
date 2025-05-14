@@ -3,14 +3,48 @@ import React, { useEffect, useRef } from 'react';
 
 interface AnimatedBackgroundProps {
   scrollY: number;
+  activeSection: number;
+  transitionProgress: number;
 }
 
-const AnimatedBackground = ({ scrollY }: AnimatedBackgroundProps) => {
+interface PatternConfig {
+  a: number;
+  b: number;
+  n: number;
+  m: number;
+}
+
+const AnimatedBackground = ({ scrollY, activeSection, transitionProgress }: AnimatedBackgroundProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const shaderRef = useRef<any>(null);
   
-  // Normalized scroll position values (0 to 1)
-  const normalizedScrollX = (scrollY % 1000) / 1000; // horizontal variant based on scroll
+  // Define pattern configurations for each section
+  const patternConfigs: PatternConfig[] = [
+    { a: 1.0, b: 1.0, n: 1.0, m: 2.0 },   // Section 1
+    { a: 3.0, b: -2.0, n: 2.5, m: 3.5 },  // Section 2
+    { a: -4.0, b: 4.0, n: 4.0, m: 4.6 },  // Section 3
+  ];
+
+  // Linear interpolation function to blend between values
+  const lerp = (start: number, end: number, t: number) => {
+    return start * (1 - t) + end * t;
+  };
+
+  // Get interpolated configuration between current and next section
+  const getInterpolatedConfig = () => {
+    const currentConfig = patternConfigs[activeSection];
+    const nextConfig = patternConfigs[Math.min(activeSection + 1, patternConfigs.length - 1)];
+    
+    return {
+      a: lerp(currentConfig.a, nextConfig.a, transitionProgress),
+      b: lerp(currentConfig.b, nextConfig.b, transitionProgress),
+      n: lerp(currentConfig.n, nextConfig.n, transitionProgress),
+      m: lerp(currentConfig.m, nextConfig.m, transitionProgress),
+    };
+  };
+
+  // Normalized scroll position values (0 to 1) - still used for subtle variations
+  const normalizedScrollX = (scrollY % 1000) / 1000;
   const normalizedScrollY = scrollY / (document.body.scrollHeight - window.innerHeight);
 
   useEffect(() => {
@@ -47,21 +81,22 @@ const AnimatedBackground = ({ scrollY }: AnimatedBackgroundProps) => {
       uniform vec2 resolution;
       uniform float time;
       uniform vec2 xy;
+      uniform float a_param;
+      uniform float b_param;
+      uniform float n_param;
+      uniform float m_param;
 
       void main(void) {
         const float PI = 3.14159265;
         vec2 p = (2.0 * gl_FragCoord.xy - resolution.xy) / resolution.y;
 
-        vec4 s1 = vec4(1.0, 1.0, 1.0, 2.0);
-        vec4 s2 = vec4(-4.0, 4.0, 4.0, 4.6);
-
         float tx = sin(time)*0.1; 
         float ty = cos(time)*0.1; 
 
-        float a = mix(s1.x, s2.x, xy.x+tx);
-        float b = mix(s1.y, s2.y, xy.x+tx);
-        float n = mix(s1.z, s2.z, xy.y+ty);
-        float m = mix(s1.w, s2.w, xy.y+ty);
+        float a = a_param + tx * 0.2;
+        float b = b_param + tx * 0.2;
+        float n = n_param + ty * 0.2;
+        float m = m_param + ty * 0.2;
 
         float max_amp = abs(a) + abs(b);
         float amp = a * sin(PI*n*p.x) * sin(PI*m*p.y) + b * sin(PI*m*p.x) * sin(PI*n*p.y);
@@ -103,6 +138,10 @@ const AnimatedBackground = ({ scrollY }: AnimatedBackgroundProps) => {
     const timeLocation = gl.getUniformLocation(program, "time");
     const resolutionLocation = gl.getUniformLocation(program, "resolution");
     const xyLocation = gl.getUniformLocation(program, "xy");
+    const aParamLocation = gl.getUniformLocation(program, "a_param");
+    const bParamLocation = gl.getUniformLocation(program, "b_param");
+    const nParamLocation = gl.getUniformLocation(program, "n_param");
+    const mParamLocation = gl.getUniformLocation(program, "m_param");
 
     let startTime = Date.now();
 
@@ -111,9 +150,19 @@ const AnimatedBackground = ({ scrollY }: AnimatedBackgroundProps) => {
       if (!canvas) return;
       
       const time = (Date.now() - startTime) * 0.001;
+      
+      // Get interpolated pattern configuration
+      const config = getInterpolatedConfig();
+      
       gl.uniform1f(timeLocation, time);
       gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
       gl.uniform2f(xyLocation, normalizedScrollX, normalizedScrollY);
+      
+      // Pass interpolated parameters to shader
+      gl.uniform1f(aParamLocation, config.a);
+      gl.uniform1f(bParamLocation, config.b);
+      gl.uniform1f(nParamLocation, config.n);
+      gl.uniform1f(mParamLocation, config.m);
       
       gl.drawArrays(gl.TRIANGLES, 0, 6);
       shaderRef.current = requestAnimationFrame(animate);
@@ -127,7 +176,7 @@ const AnimatedBackground = ({ scrollY }: AnimatedBackgroundProps) => {
         cancelAnimationFrame(shaderRef.current);
       }
     };
-  }, [normalizedScrollX, normalizedScrollY]);
+  }, [activeSection, transitionProgress, normalizedScrollX, normalizedScrollY]);
 
   return (
     <canvas 

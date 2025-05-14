@@ -8,6 +8,7 @@ import AnimatedBackground from "@/components/AnimatedBackground";
 const Index = () => {
   const [activeSection, setActiveSection] = useState(0);
   const [scrollY, setScrollY] = useState(0);
+  const [transitionProgress, setTransitionProgress] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const sections = [
     {
@@ -52,6 +53,11 @@ const Index = () => {
         );
       }
       
+      // Calculate transition progress between sections (0 to 1)
+      const sectionStart = currentSection * sectionHeight;
+      const progressWithinSection = (scrollPosition - sectionStart) / sectionHeight;
+      setTransitionProgress(Math.max(0, Math.min(1, progressWithinSection)));
+      
       if (currentSection >= 0 && currentSection < sections.length) {
         setActiveSection(currentSection);
       }
@@ -73,7 +79,11 @@ const Index = () => {
       >
         <div className="sticky top-0 h-screen overflow-hidden flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
           {/* WebGL animated background */}
-          <AnimatedBackground scrollY={scrollY} />
+          <AnimatedBackground 
+            scrollY={scrollY} 
+            activeSection={activeSection}
+            transitionProgress={transitionProgress}
+          />
           
           {/* Pattern overlay */}
           <div className="absolute inset-0 w-full h-full opacity-20 pointer-events-none">
