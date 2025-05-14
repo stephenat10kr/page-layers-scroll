@@ -1,3 +1,4 @@
+
 import { useEffect, useRef, useState } from "react";
 import Hero from "@/components/Hero";
 import ScrollSection from "@/components/ScrollSection";
@@ -66,6 +67,24 @@ const Index = () => {
         className="h-[400vh] relative"
       >
         <div className="sticky top-0 h-screen overflow-hidden flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
+          {/* Pattern overlay */}
+          <div className="absolute inset-0 w-full h-full opacity-20 pointer-events-none">
+            <div className="absolute inset-0 w-full h-full" 
+                 style={{ 
+                   backgroundImage: `radial-gradient(circle at 25px 25px, rgba(0,0,0,0.2) 2%, transparent 0%), 
+                                     radial-gradient(circle at 75px 75px, rgba(0,0,0,0.2) 2%, transparent 0%)`,
+                   backgroundSize: "100px 100px"
+                 }}>
+            </div>
+            <div className="absolute inset-0 w-full h-full" 
+                 style={{
+                   backgroundImage: `linear-gradient(45deg, rgba(30,41,59,0.1) 25%, transparent 25%, transparent 50%, 
+                                    rgba(30,41,59,0.1) 50%, rgba(30,41,59,0.1) 75%, transparent 75%, transparent)`,
+                   backgroundSize: "60px 60px"
+                 }}>
+            </div>
+          </div>
+          
           {sections.map((section, index) => (
             <ScrollSection
               key={section.id}
