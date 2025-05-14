@@ -48,12 +48,12 @@ const ScrollSection = ({ section, isActive, index, activeIndex }: SectionProps) 
         transform
       }}
     >
-      <div className="max-w-3xl mx-auto text-center p-8 bg-transparent backdrop-blur-sm rounded-xl">
-        <h2 className="text-4xl font-bold mb-4 text-white">{section.title}</h2>
-        <p className="text-xl text-white">{section.description}</p>
+      <div className="max-w-3xl mx-auto text-center p-8 bg-white/90 backdrop-blur-sm rounded-xl shadow-xl">
+        <h2 className="text-4xl font-bold mb-4">{section.title}</h2>
+        <p className="text-xl">{section.description}</p>
         
-        <div className="mt-8 p-6 rounded-lg bg-white/10 backdrop-blur-sm">
-          <p className="text-white/80">
+        <div className="mt-8 p-6 rounded-lg bg-slate-50">
+          <p className="text-slate-600">
             This is section {index + 1} of our scroll-jacked experience. As you scroll, 
             the background stays fixed while the content animates smoothly between sections.
           </p>
