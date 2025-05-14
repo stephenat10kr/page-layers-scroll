@@ -24,13 +24,10 @@ const ScrollSection = ({ section, isActive, index, activeIndex }: SectionProps) 
   const isVisible = offset >= -1 && offset <= 1;
   
   // Calculate opacity and transform based on the offset
-  let opacity = 0; // Start with 0 opacity by default
+  let opacity = 1;
   let transform = "translateX(0)";
   
-  if (offset === 0) {
-    // Active section
-    opacity = 1;
-  } else if (offset > 0) {
+  if (offset > 0) {
     // Next section(s)
     opacity = 0.2;
     transform = "translateX(50%)";
