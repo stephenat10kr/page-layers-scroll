@@ -1,28 +1,54 @@
 
-import { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 interface AnimatedBackgroundProps {
-  className?: string;
+  scrollY: number;
 }
 
-const AnimatedBackground = ({ className }: AnimatedBackgroundProps) => {
+const AnimatedBackground = ({ scrollY }: AnimatedBackgroundProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animationRef = useRef<number | null>(null);
+  const shaderRef = useRef<any>(null);
+  
+  // Normalized scroll position values (0 to 1)
+  const normalizedScrollX = (scrollY % 1000) / 1000; // horizontal variant based on scroll
+  const normalizedScrollY = scrollY / (document.body.scrollHeight - window.innerHeight);
 
   useEffect(() => {
-    // Load the RGBA library dynamically
-    const script = document.createElement('script');
-    script.src = 'https://raw.githack.com/strangerintheq/rgba/0.0.1/src/rgba.js';
-    script.async = true;
-    
-    let rgba: any;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-    script.onload = () => {
-      // Make sure the canvas exists and RGBA is loaded
-      if (!canvasRef.current || !window.RGBA) return;
-      
-      // Initialize the RGBA instance with the shader
-      rgba = new window.RGBA(`void main(void) {
+    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl') as WebGLRenderingContext;
+    if (!gl) {
+      console.error('WebGL not supported');
+      return;
+    }
+
+    // Set canvas dimensions
+    const resizeCanvas = () => {
+      const { width, height } = canvas.getBoundingClientRect();
+      canvas.width = width * window.devicePixelRatio;
+      canvas.height = height * window.devicePixelRatio;
+      gl.viewport(0, 0, canvas.width, canvas.height);
+    };
+
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    // Shader source code
+    const vertexShaderSource = `
+      attribute vec2 a_position;
+      void main() {
+        gl_Position = vec4(a_position, 0, 1);
+      }
+    `;
+
+    const fragmentShaderSource = `
+      precision mediump float;
+      uniform vec2 resolution;
+      uniform float time;
+      uniform vec2 xy;
+
+      void main(void) {
         const float PI = 3.14159265;
         vec2 p = (2.0 * gl_FragCoord.xy - resolution.xy) / resolution.y;
 
@@ -41,52 +67,72 @@ const AnimatedBackground = ({ className }: AnimatedBackgroundProps) => {
         float amp = a * sin(PI*n*p.x) * sin(PI*m*p.y) + b * sin(PI*m*p.x) * sin(PI*n*p.y);
         float col = 1.0 - smoothstep(abs(amp), 0.0, 0.1);
         gl_FragColor = vec4(vec3(col), 1.0);
-      }`, {
-        uniforms: {xy: '2f'},
-        canvas: canvasRef.current
-      });
+      }
+    `;
 
-      // Update shader uniforms based on scroll position
-      const handleScroll = () => {
-        if (!rgba) return;
-        
-        // Calculate scroll position as values between 0 and 1
-        const scrollY = window.scrollY;
-        const maxScroll = document.body.scrollHeight - window.innerHeight;
-        const scrollRatio = Math.min(scrollY / maxScroll, 1);
-        
-        // Use scroll position to affect the shader
-        rgba.xy([scrollRatio, scrollRatio * 0.5]);
-      };
+    // Create shaders
+    const vertexShader = gl.createShader(gl.VERTEX_SHADER)!;
+    gl.shaderSource(vertexShader, vertexShaderSource);
+    gl.compileShader(vertexShader);
 
-      window.addEventListener('scroll', handleScroll);
+    const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER)!;
+    gl.shaderSource(fragmentShader, fragmentShaderSource);
+    gl.compileShader(fragmentShader);
+
+    // Create program
+    const program = gl.createProgram()!;
+    gl.attachShader(program, vertexShader);
+    gl.attachShader(program, fragmentShader);
+    gl.linkProgram(program);
+    gl.useProgram(program);
+
+    // Set up buffers
+    const positionBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]),
+      gl.STATIC_DRAW
+    );
+
+    // Set up attributes and uniforms
+    const positionLocation = gl.getAttribLocation(program, "a_position");
+    gl.enableVertexAttribArray(positionLocation);
+    gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+
+    const timeLocation = gl.getUniformLocation(program, "time");
+    const resolutionLocation = gl.getUniformLocation(program, "resolution");
+    const xyLocation = gl.getUniformLocation(program, "xy");
+
+    let startTime = Date.now();
+
+    // Animation loop
+    const animate = () => {
+      if (!canvas) return;
       
-      // Trigger initial render
-      handleScroll();
+      const time = (Date.now() - startTime) * 0.001;
+      gl.uniform1f(timeLocation, time);
+      gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
+      gl.uniform2f(xyLocation, normalizedScrollX, normalizedScrollY);
       
-      return () => {
-        window.removeEventListener('scroll', handleScroll);
-      };
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+      shaderRef.current = requestAnimationFrame(animate);
     };
 
-    document.body.appendChild(script);
+    animate();
 
-    // Cleanup
     return () => {
-      if (document.body.contains(script)) {
-        document.body.removeChild(script);
-      }
-      if (animationRef.current !== null) {
-        cancelAnimationFrame(animationRef.current);
+      window.removeEventListener('resize', resizeCanvas);
+      if (shaderRef.current) {
+        cancelAnimationFrame(shaderRef.current);
       }
     };
-  }, []);
+  }, [normalizedScrollX, normalizedScrollY]);
 
   return (
-    <canvas
+    <canvas 
       ref={canvasRef}
-      className={`absolute inset-0 w-full h-full ${className || ''}`}
-      style={{ opacity: 0.3 }}
+      className="absolute inset-0 w-full h-full pointer-events-none opacity-40"
     />
   );
 };
