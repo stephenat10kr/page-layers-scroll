@@ -24,6 +24,11 @@ const Index = () => {
     {
       id: "section3",
       title: "Section Three",
+      description: "The third section with its own distinct animation pattern."
+    },
+    {
+      id: "section4",
+      title: "Section Four",
       description: "The final section in our scroll-jacked area before continuing to the footer."
     }
   ];
@@ -38,34 +43,21 @@ const Index = () => {
       const scrollContainer = scrollContainerRef.current;
       const { top, height } = scrollContainer.getBoundingClientRect();
       const scrollPosition = -top;
-      const sectionHeight = height / 4; // Change from 5 to 4 since we're going back to 400vh
+      const sectionHeight = height / 4; // 4 sections, each 100vh tall (total 400vh)
       
       if (scrollPosition < 0) return;
       
-      // Determine current active section
-      let currentSection;
-      if (scrollPosition >= sectionHeight * 3) {
-        currentSection = 2; // Keep section 3 (index 2) active for the last sections
-      } else {
-        currentSection = Math.min(
-          Math.floor(scrollPosition / sectionHeight),
-          sections.length - 1
-        );
-      }
+      // Determine current active section (0 to 3)
+      const currentSection = Math.min(
+        Math.floor(scrollPosition / sectionHeight),
+        sections.length - 1
+      );
       
       // Calculate transition progress between sections (0 to 1)
-      let progress;
-      if (currentSection < 2) {
-        // For sections 0 and 1, normal transition (0-1)
-        const sectionStart = currentSection * sectionHeight;
-        progress = (scrollPosition - sectionStart) / sectionHeight;
-      } else {
-        // For section 2 (index 2), extended transition (0-2) over the last 100vh
-        const sectionStart = 2 * sectionHeight; // Start of section 3
-        progress = (scrollPosition - sectionStart) / sectionHeight; // Progress over 1 section height
-      }
+      const sectionStart = currentSection * sectionHeight;
+      const progress = (scrollPosition - sectionStart) / sectionHeight;
       
-      setTransitionProgress(Math.max(0, Math.min(1, progress))); // Changed from 2 to 1 to limit progress to 0-1 for 400vh
+      setTransitionProgress(Math.max(0, Math.min(1, progress)));
       
       if (currentSection >= 0 && currentSection < sections.length) {
         setActiveSection(currentSection);
@@ -81,7 +73,7 @@ const Index = () => {
       {/* Normal scrolling section at top */}
       <Hero />
       
-      {/* Scroll-jacked section - changed from 500vh to 400vh */}
+      {/* Scroll-jacked section - 400vh total, 100vh per section */}
       <div 
         ref={scrollContainerRef}
         className="h-[400vh] relative"

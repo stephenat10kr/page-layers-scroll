@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef } from 'react';
 
 interface AnimatedBackgroundProps {
@@ -17,12 +18,13 @@ const AnimatedBackground = ({ scrollY, activeSection, transitionProgress }: Anim
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const shaderRef = useRef<any>(null);
   
-  // Define pattern configurations for each section
+  // Define pattern configurations for each of the 5 transition points (0vh, 100vh, 200vh, 300vh, 400vh)
   const patternConfigs: PatternConfig[] = [
-    { a: 1.0, b: 1.0, n: 1.0, m: 2.0 },   // Section 1
-    { a: 3.0, b: -2.0, n: 2.5, m: 3.5 },  // Section 2
-    { a: -4.0, b: 4.0, n: 4.0, m: 4.6 },  // Section 3
-    { a: 5.0, b: -4.5, n: 6.0, m: 3.0 },  // Final pattern (Section 3 end state)
+    { a: 1.0, b: 1.0, n: 1.0, m: 2.0 },    // 0vh - Initial pattern
+    { a: 3.0, b: -2.0, n: 2.5, m: 3.5 },   // 100vh - Second section
+    { a: -4.0, b: 4.0, n: 4.0, m: 4.6 },   // 200vh - Third section
+    { a: 5.0, b: -4.5, n: 6.0, m: 3.0 },   // 300vh - Fourth section
+    { a: 2.0, b: 3.0, n: 8.0, m: 2.0 }     // 400vh - Final pattern
   ];
 
   // Linear interpolation function to blend between values
@@ -33,22 +35,7 @@ const AnimatedBackground = ({ scrollY, activeSection, transitionProgress }: Anim
   // Get interpolated configuration between current and next section
   const getInterpolatedConfig = () => {
     const currentConfig = patternConfigs[activeSection];
-    
-    // For the last section with standard transition
-    if (activeSection === 2) {
-      const finalConfig = patternConfigs[3]; // The final pattern
-      
-      // Normal transition from section 3 to final pattern
-      return {
-        a: lerp(currentConfig.a, finalConfig.a, transitionProgress),
-        b: lerp(currentConfig.b, finalConfig.b, transitionProgress),
-        n: lerp(currentConfig.n, finalConfig.n, transitionProgress),
-        m: lerp(currentConfig.m, finalConfig.m, transitionProgress),
-      };
-    }
-    
-    // For other sections, normal transition to the next section
-    const nextConfig = patternConfigs[Math.min(activeSection + 1, patternConfigs.length - 2)];
+    const nextConfig = patternConfigs[Math.min(activeSection + 1, patternConfigs.length - 1)];
     
     return {
       a: lerp(currentConfig.a, nextConfig.a, transitionProgress),
