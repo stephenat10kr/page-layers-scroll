@@ -1,3 +1,4 @@
+
 import { useEffect, useRef, useState } from "react";
 import Hero from "@/components/Hero";
 import ScrollSection from "@/components/ScrollSection";
@@ -38,7 +39,7 @@ const Index = () => {
       const scrollContainer = scrollContainerRef.current;
       const { top, height, bottom } = scrollContainer.getBoundingClientRect();
       const scrollPosition = -top;
-      const sectionHeight = height / 3; // Divide by 3 for three 100vh transition segments
+      const sectionHeight = height / 4; // Divide by 4 for three sections plus extended final section
       const viewportHeight = window.innerHeight;
       
       if (scrollPosition < 0) return;
@@ -60,10 +61,14 @@ const Index = () => {
         // 100vh to 200vh - Section 2 to Section 3 transition
         currentSection = 1;
         progress = (scrollPosition - sectionHeight) / sectionHeight;
-      } else {
-        // 200vh to 300vh - Section 3 to End transition
+      } else if (scrollPosition < sectionHeight * 3) {
+        // 200vh to 300vh - Section 3 
         currentSection = 2;
-        progress = (scrollPosition - sectionHeight * 2) / sectionHeight;
+        progress = 0;
+      } else {
+        // 300vh to 400vh - Section 3 to End transition
+        currentSection = 2;
+        progress = (scrollPosition - sectionHeight * 3) / sectionHeight;
       }
       
       // Apply ease-in-out smoothing to the progress
@@ -89,10 +94,10 @@ const Index = () => {
       {/* Normal scrolling section at top */}
       <Hero />
       
-      {/* Scroll-jacked section - 300vh for three 100vh transition segments */}
+      {/* Scroll-jacked section - 400vh for three sections + extended final section */}
       <div 
         ref={scrollContainerRef}
-        className="h-[300vh] relative"
+        className="h-[400vh] relative"
       >
         <div className="sticky top-0 h-screen overflow-hidden flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
           {/* WebGL animated background */}
