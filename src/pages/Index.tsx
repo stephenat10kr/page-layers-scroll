@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState } from "react";
 import Hero from "@/components/Hero";
 import ScrollSection from "@/components/ScrollSection";
@@ -39,7 +38,7 @@ const Index = () => {
       const scrollContainer = scrollContainerRef.current;
       const { top, height, bottom } = scrollContainer.getBoundingClientRect();
       const scrollPosition = -top;
-      const sectionHeight = height / 3; // Divide by 3 for three 100vh transition segments (removed exit buffer)
+      const sectionHeight = height / 3; // Divide by 3 for three 100vh transition segments
       const viewportHeight = window.innerHeight;
       
       if (scrollPosition < 0) return;
@@ -62,21 +61,15 @@ const Index = () => {
         currentSection = 1;
         progress = (scrollPosition - sectionHeight) / sectionHeight;
       } else {
-        // 200vh to 300vh - Section 3 (no more exit transition)
+        // 200vh to 300vh - Section 3 to End transition
         currentSection = 2;
-        progress = 1;
+        progress = (scrollPosition - sectionHeight * 2) / sectionHeight;
       }
       
-      // If we're leaving the viewport, calculate exit progress
-      if (isLeavingViewport) {
-        // Calculate exit transition progress (0 -> 1 as section leaves)
-        progress = Math.pow(1 - (bottom / viewportHeight), 2);
-      } else {
-        // Apply ease-in-out smoothing to the progress
-        progress = progress < 0.5 
-          ? 2 * progress * progress 
-          : 1 - Math.pow(-2 * progress + 2, 2) / 2;
-      }
+      // Apply ease-in-out smoothing to the progress
+      progress = progress < 0.5 
+        ? 2 * progress * progress 
+        : 1 - Math.pow(-2 * progress + 2, 2) / 2;
       
       // Ensure progress is within bounds
       progress = Math.max(0, Math.min(1, progress));
@@ -96,7 +89,7 @@ const Index = () => {
       {/* Normal scrolling section at top */}
       <Hero />
       
-      {/* Scroll-jacked section - 300vh for three 100vh transition segments (removed exit buffer) */}
+      {/* Scroll-jacked section - 300vh for three 100vh transition segments */}
       <div 
         ref={scrollContainerRef}
         className="h-[300vh] relative"

@@ -10,22 +10,29 @@ export const lerp = (start: number, end: number, t: number) => {
 
 // Get interpolated configuration between current and next section
 export const getInterpolatedConfig = (activeSection: number, transitionProgress: number, isExiting: boolean) => {
-  // If we're in the last section and exiting, we don't need special handling
-  // as there's no exit buffer anymore
   const currentConfig = patternConfigs[activeSection];
   
-  // For the last section, or if we're exiting, don't transition to anything
-  if (activeSection === patternConfigs.length - 1 || isExiting) {
-    return currentConfig;
+  // For the last section, if we're in transition, blend to the "end" config
+  if (activeSection === 2 && transitionProgress > 0) {
+    const endConfig = patternConfigs[3]; // End state pattern
+    return {
+      a: lerp(currentConfig.a, endConfig.a, transitionProgress),
+      b: lerp(currentConfig.b, endConfig.b, transitionProgress),
+      n: lerp(currentConfig.n, endConfig.n, transitionProgress),
+      m: lerp(currentConfig.m, endConfig.m, transitionProgress),
+    };
   }
   
-  // Normal section transitions
-  const nextConfig = patternConfigs[activeSection + 1];
+  // For other sections, check if we're transitioning to the next section
+  if (activeSection < patternConfigs.length - 2 && !isExiting) {
+    const nextConfig = patternConfigs[activeSection + 1];
+    return {
+      a: lerp(currentConfig.a, nextConfig.a, transitionProgress),
+      b: lerp(currentConfig.b, nextConfig.b, transitionProgress),
+      n: lerp(currentConfig.n, nextConfig.n, transitionProgress),
+      m: lerp(currentConfig.m, nextConfig.m, transitionProgress),
+    };
+  }
   
-  return {
-    a: lerp(currentConfig.a, nextConfig.a, transitionProgress),
-    b: lerp(currentConfig.b, nextConfig.b, transitionProgress),
-    n: lerp(currentConfig.n, nextConfig.n, transitionProgress),
-    m: lerp(currentConfig.m, nextConfig.m, transitionProgress),
-  };
+  return currentConfig;
 };

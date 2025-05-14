@@ -15,7 +15,7 @@ export const fragmentShaderSource = `
   uniform float b_param;
   uniform float n_param;
   uniform float m_param;
-  uniform int transitionSection; // New uniform to identify the current transition section
+  uniform int transitionSection; // Uniform to identify the current transition section
 
   void main(void) {
     const float PI = 3.14159265;
@@ -44,9 +44,12 @@ export const fragmentShaderSource = `
     } else if (transitionSection == 1) {
       // Section 2 to 3 transition (green tint)
       finalColor = mix(baseColor, vec3(0.5, 1.0, 0.7), 0.3);
-    } else {
+    } else if (transitionSection == 2) {
       // Section 3 (purple tint)
       finalColor = mix(baseColor, vec3(0.8, 0.5, 1.0), 0.3);
+    } else {
+      // Section 3 to End transition (orange/gold tint)
+      finalColor = mix(baseColor, vec3(1.0, 0.7, 0.3), 0.3);
     }
     
     gl_FragColor = vec4(finalColor, 1.0);

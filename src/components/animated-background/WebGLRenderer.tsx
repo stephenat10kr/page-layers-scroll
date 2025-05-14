@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState } from 'react';
 import { getInterpolatedConfig } from './utils';
 import { vertexShaderSource, fragmentShaderSource } from './shaders';
@@ -20,9 +21,13 @@ const WebGLRenderer = ({ scrollY, activeSection, transitionProgress, isExiting }
   
   // Calculate transition section based on scroll position
   useEffect(() => {
-    // No more exit buffer - just use the activeSection
-    setTransitionSection(activeSection);
-  }, [activeSection]);
+    // When in section 3 with transition progress, we're in section 3→End transition
+    if (activeSection === 2 && transitionProgress > 0) {
+      setTransitionSection(3); // This will be the new section 3→End transition
+    } else {
+      setTransitionSection(activeSection);
+    }
+  }, [activeSection, transitionProgress]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -134,6 +139,7 @@ const WebGLRenderer = ({ scrollY, activeSection, transitionProgress, isExiting }
         {transitionSection === 0 && "Section 1→2"}
         {transitionSection === 1 && "Section 2→3"}
         {transitionSection === 2 && "Section 3"}
+        {transitionSection === 3 && "Section 3→End"}
       </div>
     </>
   );
