@@ -39,7 +39,7 @@ const Index = () => {
       const scrollContainer = scrollContainerRef.current;
       const { top, height, bottom } = scrollContainer.getBoundingClientRect();
       const scrollPosition = -top;
-      const sectionHeight = height / 3; // Divide by 3 for three 100vh transition segments
+      const sectionHeight = height / 4; // Divide by 4 for four 100vh transition segments
       const viewportHeight = window.innerHeight;
       
       if (scrollPosition < 0) return;
@@ -61,10 +61,14 @@ const Index = () => {
         // 100vh to 200vh - Section 2 to Section 3 transition
         currentSection = 1;
         progress = (scrollPosition - sectionHeight) / sectionHeight;
-      } else {
+      } else if (scrollPosition < sectionHeight * 3) {
         // 200vh to 300vh - Section 3 to Exit transition
         currentSection = 2;
         progress = (scrollPosition - (sectionHeight * 2)) / sectionHeight;
+      } else {
+        // 300vh to 400vh - Extra buffer space for exit transition completion
+        currentSection = 2; // Still section 3 but with exit transition
+        progress = 1; // Full transition progress
       }
       
       // If we're leaving the viewport, calculate exit progress
@@ -97,7 +101,7 @@ const Index = () => {
       {/* Normal scrolling section at top */}
       <Hero />
       
-      {/* Scroll-jacked section - 400vh for adequate buffer space */}
+      {/* Scroll-jacked section - 400vh for four 100vh transition segments */}
       <div 
         ref={scrollContainerRef}
         className="h-[400vh] relative"
