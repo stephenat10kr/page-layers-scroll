@@ -28,10 +28,10 @@ export const fragmentShaderSource = `
     // Apply conditional time influence for purple transition
     float timeInfluence = 0.15;  // Default time influence
     if (transitionSection == 2) {  // Purple transition (Section 3 to Exit)
-      timeInfluence = 0.35;  // Increase animation influence for purple transition
-      // Add a bit more motion variation for this section
-      tx = sin(time * 0.8) * 0.08; 
-      ty = cos(time * 0.7) * 0.08;
+      timeInfluence = 0.7;  // Dramatically increase animation influence for purple transition
+      // Add significantly more motion variation for this section
+      tx = sin(time * 1.2) * 0.15 + cos(time * 0.5) * 0.08; 
+      ty = cos(time * 0.9) * 0.15 + sin(time * 0.7) * 0.08;
     }
 
     float a = a_param + tx * timeInfluence;
@@ -56,6 +56,10 @@ export const fragmentShaderSource = `
     } else if (transitionSection == 2) {
       // Section 3 to Exit transition (purple tint)
       finalColor = mix(baseColor, vec3(0.8, 0.5, 1.0), 0.3);
+      
+      // Add pulsing effect only for purple transition
+      float pulse = sin(time * 2.0) * 0.15 + 0.85;
+      finalColor *= pulse;
     } else {
       // Default/exit buffer transition (orange tint)
       finalColor = mix(baseColor, vec3(1.0, 0.7, 0.4), 0.3);
