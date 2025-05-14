@@ -54,9 +54,22 @@ const Index = () => {
       }
       
       // Calculate transition progress between sections (0 to 1)
-      const sectionStart = currentSection * sectionHeight;
-      const progressWithinSection = (scrollPosition - sectionStart) / sectionHeight;
-      setTransitionProgress(Math.max(0, Math.min(1, progressWithinSection)));
+      // For section 3, extend the transition progress to go from 0 to 2
+      let progress;
+      if (currentSection === 2) { // For section 3
+        const sectionStart = 2 * sectionHeight;
+        // Calculate progress that goes from 0 to 2 through the entire section 3 (including extra scroll)
+        progress = (scrollPosition - sectionStart) / sectionHeight * 2;
+        // Clamp between 0 and 2
+        progress = Math.max(0, Math.min(2, progress));
+      } else {
+        const sectionStart = currentSection * sectionHeight;
+        progress = (scrollPosition - sectionStart) / sectionHeight;
+        // Clamp between 0 and 1
+        progress = Math.max(0, Math.min(1, progress));
+      }
+      
+      setTransitionProgress(progress);
       
       if (currentSection >= 0 && currentSection < sections.length) {
         setActiveSection(currentSection);
