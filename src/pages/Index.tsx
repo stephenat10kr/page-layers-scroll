@@ -42,9 +42,9 @@ const Index = () => {
       
       if (scrollPosition < 0) return;
       
-      // Keep section 3 active during the last 100vh of scroll
+      // Calculate current section
       let currentSection;
-      if (scrollPosition >= sectionHeight * 3) {
+      if (scrollPosition >= sectionHeight * 2) {
         currentSection = 2; // Keep section 3 (index 2) active for the last section
       } else {
         currentSection = Math.min(
@@ -53,10 +53,21 @@ const Index = () => {
         );
       }
       
-      // Calculate transition progress between sections (0 to 1)
-      const sectionStart = currentSection * sectionHeight;
-      const progressWithinSection = (scrollPosition - sectionStart) / sectionHeight;
-      setTransitionProgress(Math.max(0, Math.min(1, progressWithinSection)));
+      // Calculate transition progress between sections (0 to 1, or 0 to 2 for section 3)
+      let progress;
+      if (currentSection === 2) {
+        // For section 3, calculate progress through both the regular section and the extended area
+        const section3Start = sectionHeight * 2;
+        const progressInSection3 = (scrollPosition - section3Start) / (sectionHeight * 2); // Spans 2 section heights
+        progress = Math.max(0, Math.min(2, progressInSection3)); // Allow progress to go up to 2
+      } else {
+        // For sections 1 and 2, calculate normal progress (0 to 1)
+        const sectionStart = currentSection * sectionHeight;
+        progress = (scrollPosition - sectionStart) / sectionHeight;
+        progress = Math.max(0, Math.min(1, progress));
+      }
+      
+      setTransitionProgress(progress);
       
       if (currentSection >= 0 && currentSection < sections.length) {
         setActiveSection(currentSection);
@@ -72,7 +83,7 @@ const Index = () => {
       {/* Normal scrolling section at top */}
       <Hero />
       
-      {/* Scroll-jacked section - increased from 300vh to 400vh */}
+      {/* Scroll-jacked section - 400vh */}
       <div 
         ref={scrollContainerRef}
         className="h-[400vh] relative"
