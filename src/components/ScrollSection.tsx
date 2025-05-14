@@ -36,6 +36,11 @@ const ScrollSection = ({ section, isActive, index, activeIndex }: SectionProps) 
     transform = "translateX(-50%)";
   }
 
+  // Section 4 (index 3) should be invisible and have no content
+  if (index === 3) {
+    return null; // Don't render anything for section 4
+  }
+
   return (
     <div 
       ref={sectionRef}
