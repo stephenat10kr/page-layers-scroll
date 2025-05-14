@@ -97,10 +97,10 @@ const Index = () => {
       {/* Normal scrolling section at top */}
       <Hero />
       
-      {/* Scroll-jacked section - 300vh for three 100vh transition segments */}
+      {/* Scroll-jacked section - 400vh for adequate buffer space */}
       <div 
         ref={scrollContainerRef}
-        className="h-[300vh] relative"
+        className="h-[400vh] relative"
       >
         <div className="sticky top-0 h-screen overflow-hidden flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
           {/* WebGL animated background */}
