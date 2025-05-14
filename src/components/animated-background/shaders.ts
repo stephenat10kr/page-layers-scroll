@@ -47,8 +47,11 @@ export const fragmentShaderSource = `
     } else if (transitionSection == 2) {
       // Section 3 (purple tint)
       finalColor = mix(baseColor, vec3(0.8, 0.5, 1.0), 0.3);
+    } else if (transitionSection == 3) {
+      // Section 3 to 4 transition (magenta tint)
+      finalColor = mix(baseColor, vec3(1.0, 0.5, 0.8), 0.3);
     } else {
-      // Section 3 to End transition (orange/gold tint)
+      // Section 4 to End transition (orange/gold tint)
       finalColor = mix(baseColor, vec3(1.0, 0.7, 0.3), 0.3);
     }
     

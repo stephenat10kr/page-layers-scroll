@@ -13,8 +13,8 @@ export const getInterpolatedConfig = (activeSection: number, transitionProgress:
   const currentConfig = patternConfigs[activeSection];
   
   // For the last section, if we're in transition, blend to the "end" config
-  if (activeSection === 2 && transitionProgress > 0) {
-    const endConfig = patternConfigs[3]; // End state pattern
+  if (activeSection === 3 && transitionProgress > 0) {
+    const endConfig = patternConfigs[4]; // End state pattern
     return {
       a: lerp(currentConfig.a, endConfig.a, transitionProgress),
       b: lerp(currentConfig.b, endConfig.b, transitionProgress),
