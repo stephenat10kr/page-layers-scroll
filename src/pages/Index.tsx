@@ -10,20 +10,17 @@ const Index = () => {
     {
       id: "section1",
       title: "Section One",
-      description: "This is the first scroll-jacked section with a unique animation.",
-      color: "bg-blue-500"
+      description: "This is the first scroll-jacked section with a unique animation."
     },
     {
       id: "section2",
       title: "Section Two",
-      description: "As you scroll, this section smoothly transitions into view.",
-      color: "bg-purple-500"
+      description: "As you scroll, this section smoothly transitions into view."
     },
     {
       id: "section3",
       title: "Section Three",
-      description: "The final section in our scroll-jacked area before continuing to the footer.",
-      color: "bg-pink-500"
+      description: "The final section in our scroll-jacked area before continuing to the footer."
     }
   ];
 
@@ -68,7 +65,7 @@ const Index = () => {
         ref={scrollContainerRef}
         className="h-[400vh] relative"
       >
-        <div className="sticky top-0 h-screen overflow-hidden flex items-center justify-center">
+        <div className="sticky top-0 h-screen overflow-hidden flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
           {sections.map((section, index) => (
             <ScrollSection
               key={section.id}
