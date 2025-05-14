@@ -25,11 +25,6 @@ const Index = () => {
       id: "section3",
       title: "Section Three",
       description: "The third section with its own distinct animation pattern."
-    },
-    {
-      id: "section4",
-      title: "Section Four",
-      description: "The final section in our scroll-jacked area before continuing to the footer."
     }
   ];
 
@@ -43,11 +38,11 @@ const Index = () => {
       const scrollContainer = scrollContainerRef.current;
       const { top, height } = scrollContainer.getBoundingClientRect();
       const scrollPosition = -top;
-      const sectionHeight = height / 4; // 4 sections, each 100vh tall (total 400vh)
+      const sectionHeight = height / 3; // 3 sections, each 100vh tall (total 300vh)
       
       if (scrollPosition < 0) return;
       
-      // Determine current active section (0 to 3)
+      // Determine current active section (0 to 2)
       const currentSection = Math.min(
         Math.floor(scrollPosition / sectionHeight),
         sections.length - 1
@@ -73,10 +68,10 @@ const Index = () => {
       {/* Normal scrolling section at top */}
       <Hero />
       
-      {/* Scroll-jacked section - 400vh total, 100vh per section */}
+      {/* Scroll-jacked section - 300vh total, 100vh per section */}
       <div 
         ref={scrollContainerRef}
-        className="h-[400vh] relative"
+        className="h-[300vh] relative"
       >
         <div className="sticky top-0 h-screen overflow-hidden flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
           {/* WebGL animated background */}
