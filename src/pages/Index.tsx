@@ -38,7 +38,7 @@ const Index = () => {
       const scrollContainer = scrollContainerRef.current;
       const { top, height } = scrollContainer.getBoundingClientRect();
       const scrollPosition = -top;
-      const sectionHeight = height / 5; // Divide by 5 instead of 4 for the 500vh scroll
+      const sectionHeight = height / 4; // Change from 5 to 4 since we're going back to 400vh
       
       if (scrollPosition < 0) return;
       
@@ -60,12 +60,12 @@ const Index = () => {
         const sectionStart = currentSection * sectionHeight;
         progress = (scrollPosition - sectionStart) / sectionHeight;
       } else {
-        // For section 2 (index 2), extended transition (0-2) over the last 200vh
+        // For section 2 (index 2), extended transition (0-2) over the last 100vh
         const sectionStart = 2 * sectionHeight; // Start of section 3
-        progress = (scrollPosition - sectionStart) / (sectionHeight * 2); // Progress over 2 section heights
+        progress = (scrollPosition - sectionStart) / sectionHeight; // Progress over 1 section height
       }
       
-      setTransitionProgress(Math.max(0, Math.min(2, progress))); // Allow progress to go up to 2 for extended transition
+      setTransitionProgress(Math.max(0, Math.min(1, progress))); // Changed from 2 to 1 to limit progress to 0-1 for 400vh
       
       if (currentSection >= 0 && currentSection < sections.length) {
         setActiveSection(currentSection);
@@ -81,10 +81,10 @@ const Index = () => {
       {/* Normal scrolling section at top */}
       <Hero />
       
-      {/* Scroll-jacked section - increased from 400vh to 500vh */}
+      {/* Scroll-jacked section - changed from 500vh to 400vh */}
       <div 
         ref={scrollContainerRef}
-        className="h-[500vh] relative"
+        className="h-[400vh] relative"
       >
         <div className="sticky top-0 h-screen overflow-hidden flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
           {/* WebGL animated background */}

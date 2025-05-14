@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 
 interface AnimatedBackgroundProps {
@@ -35,37 +34,17 @@ const AnimatedBackground = ({ scrollY, activeSection, transitionProgress }: Anim
   const getInterpolatedConfig = () => {
     const currentConfig = patternConfigs[activeSection];
     
-    // For the last section with extended transition
+    // For the last section with standard transition
     if (activeSection === 2) {
       const finalConfig = patternConfigs[3]; // The final pattern
       
-      // If transitionProgress is between 0-1, interpolate between section 3 start and middle
-      // If between 1-2, interpolate between section 3 middle and final pattern
-      if (transitionProgress <= 1) {
-        // First half of section 3 transition
-        return {
-          a: lerp(currentConfig.a, (currentConfig.a + finalConfig.a) / 2, transitionProgress),
-          b: lerp(currentConfig.b, (currentConfig.b + finalConfig.b) / 2, transitionProgress),
-          n: lerp(currentConfig.n, (currentConfig.n + finalConfig.n) / 2, transitionProgress),
-          m: lerp(currentConfig.m, (currentConfig.m + finalConfig.m) / 2, transitionProgress),
-        };
-      } else {
-        // Second half of section 3 transition
-        const adjustedProgress = transitionProgress - 1; // Convert 1-2 to 0-1
-        const midConfig = {
-          a: (currentConfig.a + finalConfig.a) / 2,
-          b: (currentConfig.b + finalConfig.b) / 2,
-          n: (currentConfig.n + finalConfig.n) / 2,
-          m: (currentConfig.m + finalConfig.m) / 2,
-        };
-        
-        return {
-          a: lerp(midConfig.a, finalConfig.a, adjustedProgress),
-          b: lerp(midConfig.b, finalConfig.b, adjustedProgress),
-          n: lerp(midConfig.n, finalConfig.n, adjustedProgress),
-          m: lerp(midConfig.m, finalConfig.m, adjustedProgress),
-        };
-      }
+      // Normal transition from section 3 to final pattern
+      return {
+        a: lerp(currentConfig.a, finalConfig.a, transitionProgress),
+        b: lerp(currentConfig.b, finalConfig.b, transitionProgress),
+        n: lerp(currentConfig.n, finalConfig.n, transitionProgress),
+        m: lerp(currentConfig.m, finalConfig.m, transitionProgress),
+      };
     }
     
     // For other sections, normal transition to the next section
