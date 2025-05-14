@@ -39,7 +39,7 @@ const Index = () => {
       const scrollContainer = scrollContainerRef.current;
       const { top, height, bottom } = scrollContainer.getBoundingClientRect();
       const scrollPosition = -top;
-      const sectionHeight = height / 4; // Divide by 4 for four 100vh segments
+      const sectionHeight = height / 3; // Divide by 3 for three 100vh transition segments
       const viewportHeight = window.innerHeight;
       
       if (scrollPosition < 0) return;
@@ -48,27 +48,23 @@ const Index = () => {
       const isLeavingViewport = bottom < viewportHeight && bottom > 0;
       setIsExiting(isLeavingViewport);
       
-      // Determine which section is active based on our new transition points
+      // Determine which section is active based on our transition points
       let currentSection;
       let progress;
       
       // Calculate section and transition progress based on scroll position
       if (scrollPosition < sectionHeight) {
-        // First 100vh - Section 1 (no transition yet)
+        // 0vh to 100vh - Section 1 to Section 2 transition
         currentSection = 0;
-        progress = 0;
+        progress = scrollPosition / sectionHeight;
       } else if (scrollPosition < sectionHeight * 2) {
-        // 100vh to 200vh - Section 1 to Section 2 transition
-        currentSection = 0;
-        progress = (scrollPosition - sectionHeight) / sectionHeight;
-      } else if (scrollPosition < sectionHeight * 3) {
-        // 200vh to 300vh - Section 2 to Section 3 transition
+        // 100vh to 200vh - Section 2 to Section 3 transition
         currentSection = 1;
-        progress = (scrollPosition - (sectionHeight * 2)) / sectionHeight;
+        progress = (scrollPosition - sectionHeight) / sectionHeight;
       } else {
-        // 300vh to 400vh - Section 3 to Exit transition
+        // 200vh to 300vh - Section 3 to Exit transition
         currentSection = 2;
-        progress = (scrollPosition - (sectionHeight * 3)) / sectionHeight;
+        progress = (scrollPosition - (sectionHeight * 2)) / sectionHeight;
       }
       
       // If we're leaving the viewport, calculate exit progress
@@ -101,10 +97,10 @@ const Index = () => {
       {/* Normal scrolling section at top */}
       <Hero />
       
-      {/* Scroll-jacked section - 400vh */}
+      {/* Scroll-jacked section - 300vh for three 100vh transition segments */}
       <div 
         ref={scrollContainerRef}
-        className="h-[400vh] relative"
+        className="h-[300vh] relative"
       >
         <div className="sticky top-0 h-screen overflow-hidden flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
           {/* WebGL animated background */}
