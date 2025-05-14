@@ -11,20 +11,17 @@ const Index = () => {
       id: "section1",
       title: "Section One",
       description: "This is the first scroll-jacked section with a unique animation.",
-      color: "bg-blue-500"
     },
     {
       id: "section2",
       title: "Section Two",
       description: "As you scroll, this section smoothly transitions into view.",
-      color: "bg-purple-500"
     },
     {
       id: "section3",
       title: "Section Three",
       description: "The final section in our scroll-jacked area before continuing to the footer.",
-      color: "bg-pink-500"
-    }
+    },
   ];
 
   useEffect(() => {
@@ -68,7 +65,27 @@ const Index = () => {
         ref={scrollContainerRef}
         className="h-[400vh] relative"
       >
-        <div className="sticky top-0 h-screen overflow-hidden flex items-center justify-center">
+        {/* Patterned background - fixed behind all sections */}
+        <div className="sticky top-0 h-screen w-full z-0 overflow-hidden">
+          <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-purple-50 to-blue-50">
+            {/* Geometric pattern overlay */}
+            <div className="absolute inset-0 opacity-10" 
+              style={{ 
+                backgroundImage: `radial-gradient(circle at 1px 1px, purple 1px, transparent 0)`,
+                backgroundSize: '40px 40px'
+              }}
+            ></div>
+            <div className="absolute inset-0 opacity-10" 
+              style={{ 
+                backgroundImage: `linear-gradient(to right, blue 1px, transparent 1px), linear-gradient(to bottom, blue 1px, transparent 1px)`,
+                backgroundSize: '40px 40px'
+              }}
+            ></div>
+          </div>
+        </div>
+        
+        {/* Content sections */}
+        <div className="sticky top-0 h-screen overflow-hidden flex items-center justify-center z-10">
           {sections.map((section, index) => (
             <ScrollSection
               key={section.id}
