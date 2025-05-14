@@ -4,17 +4,21 @@ import { useWebGLCanvas } from '../hooks/useWebGLCanvas';
 
 interface AnimatedBackgroundProps {
   scrollY: number;
-  normalizedScrollProgress: number;
+  activeSection: number;
+  transitionProgress: number;
 }
 
-const AnimatedBackground = ({ scrollY, normalizedScrollProgress }: AnimatedBackgroundProps) => {
+const AnimatedBackground = ({ scrollY, activeSection, transitionProgress }: AnimatedBackgroundProps) => {
   // Calculate normalized scroll values used for subtle variations
   const normalizedScrollX = (scrollY % 1000) / 1000;
+  const normalizedScrollY = scrollY / (document.body.scrollHeight - window.innerHeight);
   
   // Use the WebGL canvas hook to handle all the WebGL setup and rendering
   const { canvasRef } = useWebGLCanvas({
-    normalizedScrollProgress,
-    normalizedScrollX
+    activeSection,
+    transitionProgress,
+    normalizedScrollX,
+    normalizedScrollY
   });
 
   return (
