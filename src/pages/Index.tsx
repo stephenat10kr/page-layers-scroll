@@ -39,7 +39,7 @@ const Index = () => {
       const scrollContainer = scrollContainerRef.current;
       const { top, height, bottom } = scrollContainer.getBoundingClientRect();
       const scrollPosition = -top;
-      const sectionHeight = height / 4; // Divide by 4 for four 100vh transition segments
+      const sectionHeight = height / 3; // Divide by 3 for three 100vh transition segments (removed exit buffer)
       const viewportHeight = window.innerHeight;
       
       if (scrollPosition < 0) return;
@@ -61,20 +61,15 @@ const Index = () => {
         // 100vh to 200vh - Section 2 to Section 3 transition
         currentSection = 1;
         progress = (scrollPosition - sectionHeight) / sectionHeight;
-      } else if (scrollPosition < sectionHeight * 3) {
-        // 200vh to 300vh - Section 3 to Exit transition
-        currentSection = 2;
-        progress = (scrollPosition - (sectionHeight * 2)) / sectionHeight;
       } else {
-        // 300vh to 400vh - Extra buffer space for exit transition completion
-        currentSection = 2; // Still section 3 but with exit transition
-        progress = 1; // Full transition progress
+        // 200vh to 300vh - Section 3 (no more exit transition)
+        currentSection = 2;
+        progress = 1;
       }
       
       // If we're leaving the viewport, calculate exit progress
       if (isLeavingViewport) {
         // Calculate exit transition progress (0 -> 1 as section leaves)
-        // Make this transition more gradual
         progress = Math.pow(1 - (bottom / viewportHeight), 2);
       } else {
         // Apply ease-in-out smoothing to the progress
@@ -101,10 +96,10 @@ const Index = () => {
       {/* Normal scrolling section at top */}
       <Hero />
       
-      {/* Scroll-jacked section - 400vh for four 100vh transition segments */}
+      {/* Scroll-jacked section - 300vh for three 100vh transition segments (removed exit buffer) */}
       <div 
         ref={scrollContainerRef}
-        className="h-[400vh] relative"
+        className="h-[300vh] relative"
       >
         <div className="sticky top-0 h-screen overflow-hidden flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
           {/* WebGL animated background */}
