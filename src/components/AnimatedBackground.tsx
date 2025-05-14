@@ -1,31 +1,28 @@
 
 import { useEffect, useRef } from 'react';
 
-declare global {
-  interface Window {
-    RGBA: any;
-  }
-}
-
 interface AnimatedBackgroundProps {
-  scrollPosition: number;
+  className?: string;
 }
 
-const AnimatedBackground = ({ scrollPosition }: AnimatedBackgroundProps) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const rgbaInstanceRef = useRef<any>(null);
-  
+const AnimatedBackground = ({ className }: AnimatedBackgroundProps) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animationRef = useRef<number | null>(null);
+
   useEffect(() => {
-    // Load the RGBA script
+    // Load the RGBA library dynamically
     const script = document.createElement('script');
     script.src = 'https://raw.githack.com/strangerintheq/rgba/0.0.1/src/rgba.js';
     script.async = true;
     
-    const onScriptLoad = () => {
-      if (!containerRef.current) return;
+    let rgba: any;
+
+    script.onload = () => {
+      // Make sure the canvas exists and RGBA is loaded
+      if (!canvasRef.current || !window.RGBA) return;
       
-      // Initialize RGBA with the shader
-      const rgba = new window.RGBA(`void main(void) {
+      // Initialize the RGBA instance with the shader
+      rgba = new window.RGBA(`void main(void) {
         const float PI = 3.14159265;
         vec2 p = (2.0 * gl_FragCoord.xy - resolution.xy) / resolution.y;
 
@@ -44,48 +41,52 @@ const AnimatedBackground = ({ scrollPosition }: AnimatedBackgroundProps) => {
         float amp = a * sin(PI*n*p.x) * sin(PI*m*p.y) + b * sin(PI*m*p.x) * sin(PI*n*p.y);
         float col = 1.0 - smoothstep(abs(amp), 0.0, 0.1);
         gl_FragColor = vec4(vec3(col), 1.0);
-      }`, {uniforms: {xy: '2f'}});
+      }`, {
+        uniforms: {xy: '2f'},
+        canvas: canvasRef.current
+      });
+
+      // Update shader uniforms based on scroll position
+      const handleScroll = () => {
+        if (!rgba) return;
+        
+        // Calculate scroll position as values between 0 and 1
+        const scrollY = window.scrollY;
+        const maxScroll = document.body.scrollHeight - window.innerHeight;
+        const scrollRatio = Math.min(scrollY / maxScroll, 1);
+        
+        // Use scroll position to affect the shader
+        rgba.xy([scrollRatio, scrollRatio * 0.5]);
+      };
+
+      window.addEventListener('scroll', handleScroll);
       
-      rgbaInstanceRef.current = rgba;
+      // Trigger initial render
+      handleScroll();
       
-      // Append the canvas to our container
-      if (rgba.canvas && containerRef.current) {
-        rgba.canvas.style.position = 'absolute';
-        rgba.canvas.style.top = '0';
-        rgba.canvas.style.left = '0';
-        rgba.canvas.style.width = '100%';
-        rgba.canvas.style.height = '100%';
-        containerRef.current.appendChild(rgba.canvas);
-      }
+      return () => {
+        window.removeEventListener('scroll', handleScroll);
+      };
     };
-    
-    script.onload = onScriptLoad;
+
     document.body.appendChild(script);
-    
+
+    // Cleanup
     return () => {
-      document.body.removeChild(script);
-      if (containerRef.current && rgbaInstanceRef.current?.canvas) {
-        containerRef.current.removeChild(rgbaInstanceRef.current.canvas);
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
+      if (animationRef.current !== null) {
+        cancelAnimationFrame(animationRef.current);
       }
     };
   }, []);
-  
-  // Update the shader parameters based on scroll position
-  useEffect(() => {
-    if (!rgbaInstanceRef.current) return;
-    
-    // Convert scroll position to a value between 0 and 1 for the shader
-    // We'll use the scroll position to affect both x and y values
-    const normalizedScrollX = (scrollPosition % 1000) / 1000;
-    const normalizedScrollY = (scrollPosition % 1500) / 1500;
-    
-    rgbaInstanceRef.current.xy([normalizedScrollX, normalizedScrollY]);
-  }, [scrollPosition]);
 
   return (
-    <div 
-      ref={containerRef} 
-      className="absolute inset-0 w-full h-full opacity-30 pointer-events-none"
+    <canvas
+      ref={canvasRef}
+      className={`absolute inset-0 w-full h-full ${className || ''}`}
+      style={{ opacity: 0.3 }}
     />
   );
 };
