@@ -3,7 +3,6 @@ export interface AnimatedBackgroundProps {
   scrollY: number;
   activeSection: number;
   transitionProgress: number;
-  isExiting: boolean;
 }
 
 export interface PatternConfig {
