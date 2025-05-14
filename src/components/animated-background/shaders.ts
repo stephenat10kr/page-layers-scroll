@@ -21,23 +21,14 @@ export const fragmentShaderSource = `
     const float PI = 3.14159265;
     vec2 p = (2.0 * gl_FragCoord.xy - resolution.xy) / resolution.y;
 
-    // Base time animation factors
+    // Slow down the time factor for more subtle animation
     float tx = sin(time * 0.6)*0.05; 
     float ty = cos(time * 0.6)*0.05; 
-    
-    // Apply conditional time influence for purple transition
-    float timeInfluence = 0.15;  // Default time influence
-    if (transitionSection == 2 || transitionSection == 3) {  // Purple transition (Section 3 to Exit) OR Exit Buffer
-      timeInfluence = 0.7;  // Dramatically increase animation influence for purple transition
-      // Add significantly more motion variation for this section
-      tx = sin(time * 1.2) * 0.15 + cos(time * 0.5) * 0.08; 
-      ty = cos(time * 0.9) * 0.15 + sin(time * 0.7) * 0.08;
-    }
 
-    float a = a_param + tx * timeInfluence;
-    float b = b_param + tx * timeInfluence;
-    float n = n_param + ty * timeInfluence;
-    float m = m_param + ty * timeInfluence;
+    float a = a_param + tx * 0.15;
+    float b = b_param + tx * 0.15;
+    float n = n_param + ty * 0.15;
+    float m = m_param + ty * 0.15;
 
     float max_amp = abs(a) + abs(b);
     float amp = a * sin(PI*n*p.x) * sin(PI*m*p.y) + b * sin(PI*m*p.x) * sin(PI*n*p.y);
@@ -53,15 +44,11 @@ export const fragmentShaderSource = `
     } else if (transitionSection == 1) {
       // Section 2 to 3 transition (green tint)
       finalColor = mix(baseColor, vec3(0.5, 1.0, 0.7), 0.3);
-    } else if (transitionSection == 2 || transitionSection == 3) {
-      // Section 3 to Exit transition OR Exit Buffer (purple tint)
+    } else if (transitionSection == 2) {
+      // Section 3 to Exit transition (purple tint)
       finalColor = mix(baseColor, vec3(0.8, 0.5, 1.0), 0.3);
-      
-      // Add pulsing effect for purple transition or exit buffer
-      float pulse = sin(time * 2.0) * 0.15 + 0.85;
-      finalColor *= pulse;
     } else {
-      // Default transition (orange tint)
+      // Default/exit buffer transition (orange tint)
       finalColor = mix(baseColor, vec3(1.0, 0.7, 0.4), 0.3);
     }
     

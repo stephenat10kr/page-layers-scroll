@@ -7,9 +7,10 @@ interface WebGLRendererProps {
   scrollY: number;
   activeSection: number;
   transitionProgress: number;
+  isExiting: boolean;
 }
 
-const WebGLRenderer = ({ scrollY, activeSection, transitionProgress }: WebGLRendererProps) => {
+const WebGLRenderer = ({ scrollY, activeSection, transitionProgress, isExiting }: WebGLRendererProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const shaderRef = useRef<number | null>(null);
   const [transitionSection, setTransitionSection] = useState<number>(0);
@@ -20,8 +21,12 @@ const WebGLRenderer = ({ scrollY, activeSection, transitionProgress }: WebGLRend
   
   // Calculate transition section based on scroll position
   useEffect(() => {
-    setTransitionSection(activeSection); // Section transitions (0, 1, 2)
-  }, [activeSection]);
+    if (isExiting) {
+      setTransitionSection(3); // Exit buffer
+    } else {
+      setTransitionSection(activeSection); // Section transitions (0, 1, 2)
+    }
+  }, [activeSection, isExiting]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -92,7 +97,7 @@ const WebGLRenderer = ({ scrollY, activeSection, transitionProgress }: WebGLRend
       const time = (Date.now() - startTime) * 0.001;
       
       // Get interpolated pattern configuration
-      const config = getInterpolatedConfig(activeSection, transitionProgress);
+      const config = getInterpolatedConfig(activeSection, transitionProgress, isExiting);
       
       gl.uniform1f(timeLocation, time);
       gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
@@ -119,7 +124,7 @@ const WebGLRenderer = ({ scrollY, activeSection, transitionProgress }: WebGLRend
         cancelAnimationFrame(shaderRef.current);
       }
     };
-  }, [activeSection, transitionProgress, normalizedScrollX, normalizedScrollY, transitionSection]);
+  }, [activeSection, transitionProgress, normalizedScrollX, normalizedScrollY, isExiting, transitionSection]);
   
   return (
     <>
@@ -132,7 +137,8 @@ const WebGLRenderer = ({ scrollY, activeSection, transitionProgress }: WebGLRend
       <div className="absolute top-4 right-4 bg-black bg-opacity-50 text-white px-3 py-1 rounded-md text-sm font-mono z-10">
         {transitionSection === 0 && "Section 1→2"}
         {transitionSection === 1 && "Section 2→3"}
-        {transitionSection === 2 && "Section 3"}
+        {transitionSection === 2 && "Section 3→Exit"}
+        {transitionSection === 3 && "Exit Buffer"}
       </div>
     </>
   );
