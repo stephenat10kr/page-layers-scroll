@@ -1,5 +1,5 @@
 
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 
 interface SectionProps {
@@ -7,6 +7,7 @@ interface SectionProps {
     id: string;
     title: string;
     description: string;
+    color: string;
   };
   isActive: boolean;
   index: number;
@@ -41,6 +42,7 @@ const ScrollSection = ({ section, isActive, index, activeIndex }: SectionProps) 
       ref={sectionRef}
       className={cn(
         "absolute inset-0 w-full h-full flex items-center justify-center transition-all duration-1000 ease-in-out",
+        section.color,
         isVisible ? "" : "hidden"
       )}
       style={{ 
