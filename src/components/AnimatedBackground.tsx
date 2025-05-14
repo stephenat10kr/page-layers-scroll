@@ -23,7 +23,6 @@ const AnimatedBackground = ({ scrollY, activeSection, transitionProgress }: Anim
     { a: 1.0, b: 1.0, n: 1.0, m: 2.0 },   // Section 1
     { a: 3.0, b: -2.0, n: 2.5, m: 3.5 },  // Section 2
     { a: -4.0, b: 4.0, n: 4.0, m: 4.6 },  // Section 3
-    { a: 2.0, b: 2.0, n: 5.0, m: 5.0 }    // Final state (end of scroll)
   ];
 
   // Linear interpolation function to blend between values
@@ -34,27 +33,14 @@ const AnimatedBackground = ({ scrollY, activeSection, transitionProgress }: Anim
   // Get interpolated configuration between current and next section
   const getInterpolatedConfig = () => {
     const currentConfig = patternConfigs[activeSection];
+    const nextConfig = patternConfigs[Math.min(activeSection + 1, patternConfigs.length - 1)];
     
-    if (activeSection === 2 && transitionProgress > 1) {
-      // Special handling for section 3 extended transition (progress 1-2)
-      // Interpolate between section 3 config and final config
-      const normalizedProgress = transitionProgress - 1; // converts 1-2 to 0-1
-      return {
-        a: lerp(patternConfigs[2].a, patternConfigs[3].a, normalizedProgress),
-        b: lerp(patternConfigs[2].b, patternConfigs[3].b, normalizedProgress),
-        n: lerp(patternConfigs[2].n, patternConfigs[3].n, normalizedProgress),
-        m: lerp(patternConfigs[2].m, patternConfigs[3].m, normalizedProgress),
-      };
-    } else {
-      // Normal transition between adjacent sections
-      const nextConfig = patternConfigs[Math.min(activeSection + 1, patternConfigs.length - 2)];
-      return {
-        a: lerp(currentConfig.a, nextConfig.a, transitionProgress),
-        b: lerp(currentConfig.b, nextConfig.b, transitionProgress),
-        n: lerp(currentConfig.n, nextConfig.n, transitionProgress),
-        m: lerp(currentConfig.m, nextConfig.m, transitionProgress),
-      };
-    }
+    return {
+      a: lerp(currentConfig.a, nextConfig.a, transitionProgress),
+      b: lerp(currentConfig.b, nextConfig.b, transitionProgress),
+      n: lerp(currentConfig.n, nextConfig.n, transitionProgress),
+      m: lerp(currentConfig.m, nextConfig.m, transitionProgress),
+    };
   };
 
   // Normalized scroll position values (0 to 1) - still used for subtle variations
