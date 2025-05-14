@@ -1,5 +1,6 @@
 
 // Pattern configurations for the animated background
+import { lerp } from './shaderUtils';
 
 export interface PatternConfig {
   a: number;
@@ -24,8 +25,6 @@ export const getInterpolatedConfig = (
 ): PatternConfig => {
   const currentConfig = patternConfigs[activeSection];
   const nextConfig = patternConfigs[Math.min(activeSection + 1, patternConfigs.length - 1)];
-  
-  const { lerp } = require('./shaderUtils');
   
   return {
     a: lerp(currentConfig.a, nextConfig.a, transitionProgress),
