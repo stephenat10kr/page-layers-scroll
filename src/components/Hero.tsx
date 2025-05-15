@@ -5,13 +5,13 @@ import { Button } from "@/components/ui/button";
 
 const Hero = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800">
+    <div className="relative">
       {/* Video component as background with sticky positioning */}
-      <div className="w-full h-full">
+      <div className="fixed top-0 left-0 w-full h-screen z-0">
         <ScrubStickyVideo />
       </div>
       
-      {/* HeroText component overlaid on top */}
+      {/* HeroText component scrolls normally on top of the sticky video */}
       <div className="relative z-10">
         <HeroText />
       </div>

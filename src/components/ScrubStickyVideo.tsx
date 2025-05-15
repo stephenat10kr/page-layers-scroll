@@ -25,7 +25,6 @@ const ScrubStickyVideo: React.FC<ScrubStickyVideoProps> = ({
   // Use the specific Contentful asset ID for the scrub-optimized video
   const { data: videoAsset, isLoading, error } = useContentfulAsset(contentfulAssetId);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
   const scrollTriggerRef = useRef<ScrollTrigger | null>(null);
   
   // Use provided videoSrc prop or fallback to Contentful asset
@@ -101,9 +100,8 @@ const ScrubStickyVideo: React.FC<ScrubStickyVideoProps> = ({
   // Handle video loading and setup scrolltrigger
   useEffect(() => {
     const video = videoRef.current;
-    const container = containerRef.current;
     
-    if (!video || !container || !videoSrc) return;
+    if (!video || !videoSrc) return;
     
     // Configure video properties
     video.src = videoSrc;
@@ -120,11 +118,10 @@ const ScrubStickyVideo: React.FC<ScrubStickyVideoProps> = ({
       setIsVideoLoaded(true);
       
       // Setup ScrollTrigger for scrubbing
-      // This won't affect the document height, just tracks scroll progress
       if (scrollTriggerRef.current) scrollTriggerRef.current.kill();
       
       scrollTriggerRef.current = ScrollTrigger.create({
-        trigger: ".video-scrub-section", // Target the section that contains HeroText
+        trigger: "body", // Use the entire body as trigger
         start: "top top",
         end: "bottom bottom",
         scrub: 0.5,
@@ -164,20 +161,14 @@ const ScrubStickyVideo: React.FC<ScrubStickyVideoProps> = ({
         />
       )}
       
-      <div ref={containerRef} className="video-scrub-container">
-        {/* Video scrub section - this will be tracked for scrolling */}
-        <div className="video-scrub-section h-[300vh]">
-          {/* Sticky video container */}
-          <div className="sticky top-0 left-0 w-full h-screen overflow-hidden">
-            <video 
-              ref={videoRef}
-              playsInline
-              muted
-              preload="auto"
-              className="absolute top-0 left-0 w-full h-full object-cover z-0"
-            />
-          </div>
-        </div>
+      <div className="w-full h-full">
+        <video 
+          ref={videoRef}
+          playsInline
+          muted
+          preload="auto"
+          className="w-full h-full object-cover z-0"
+        />
       </div>
     </>
   );
