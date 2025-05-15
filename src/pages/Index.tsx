@@ -1,3 +1,4 @@
+
 import { useEffect, useRef, useState } from "react";
 import Hero from "@/components/Hero";
 import ScrollSection from "@/components/ScrollSection";
@@ -104,13 +105,15 @@ const Index = () => {
       <Hero />
       
       {/* RevealText component between Hero and animated sections */}
-      <RevealText
-        defaultText="Scroll down to discover more about our immersive experiences and interactive stories."
-        buttonText="JOIN OUR COMMUNITY"
-        backgroundColor="#1A1F2C"
-        textColor="#FFFFFF"
-        textGradient="linear-gradient(90deg, #9b87f5 0%, #7E69AB 100%)"
-      />
+      <div className="relative z-30">
+        <RevealText
+          defaultText="Scroll down to discover more about our immersive experiences and interactive stories."
+          buttonText="JOIN OUR COMMUNITY"
+          backgroundColor="#1A1F2C"
+          textColor="#FFFFFF"
+          textGradient="linear-gradient(90deg, #9b87f5 0%, #7E69AB 100%)"
+        />
+      </div>
       
       {/* Scroll-jacked section - 400vh for four 100vh transition segments */}
       <div 

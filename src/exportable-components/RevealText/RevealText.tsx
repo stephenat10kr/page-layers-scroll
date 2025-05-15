@@ -50,7 +50,7 @@ const RevealText = ({
   textColor = "#FFF4F1",
   textGradient = "linear-gradient(90deg, #FFB577 0%, #FFB577 100%)",
 }: RevealTextProps) => {
-  console.log("RevealText component rendering with props:", { 
+  console.log("🔍 RevealText component rendering with props:", { 
     defaultText, 
     backgroundColor, 
     textColor, 
@@ -129,20 +129,20 @@ const RevealText = ({
   });
 
   useEffect(() => {
-    console.log("RevealText useEffect running", { 
+    console.log("🔄 RevealText useEffect running", { 
       textRef: !!textRef.current,
       componentRef: !!componentRef.current 
     });
     
     const text = textRef.current;
     if (!text) {
-      console.warn("Text ref is not available yet");
+      console.warn("❌ Text ref is not available yet");
       return;
     }
 
     // Get the text content
     const originalText = text.textContent || "";
-    console.log("Original text content:", originalText);
+    console.log("📝 Original text content:", originalText);
 
     // Split text into words
     const words = originalText.split(" ");
@@ -155,59 +155,37 @@ const RevealText = ({
     text.innerHTML = formattedHTML;
     
     try {
-      // Make sure ScrollTrigger is registered before using it
-      if (!ScrollTrigger) {
-        console.error("ScrollTrigger is not available");
-        return;
-      }
+      console.log("🎬 Setting up GSAP animation for RevealText");
       
-      // Check if the component is visible
-      const componentElement = componentRef.current;
-      if (componentElement) {
-        const rect = componentElement.getBoundingClientRect();
-        console.log("RevealText component position:", {
-          top: rect.top,
-          bottom: rect.bottom,
-          visible: rect.top < window.innerHeight && rect.bottom > 0
-        });
-      }
-
-      console.log("Setting up GSAP animation");
-      
-      // Simplify the animation for debugging
+      // Create a simple animation without ScrollTrigger
       const spans = text.querySelectorAll(".char");
-      console.log(`Found ${spans.length} spans to animate`);
+      console.log(`🔤 Found ${spans.length} spans to animate`);
       
-      // Create a simple animation without ScrollTrigger first
-      gsap.to(spans, {
-        color: textColor,
-        stagger: 0.01,
-        duration: 0.5,
-        delay: 0.5
-      });
-      
-      // Try a simpler ScrollTrigger setup
-      ScrollTrigger.create({
-        trigger: text,
-        start: "top bottom",
-        onEnter: () => console.log("ScrollTrigger entered"),
-        onLeave: () => console.log("ScrollTrigger left"),
-        markers: true // Add markers for debugging
-      });
+      gsap.fromTo(spans, 
+        { opacity: 0, y: 20 }, 
+        { 
+          opacity: 1, 
+          y: 0, 
+          stagger: 0.02, 
+          duration: 0.8, 
+          delay: 0.5,
+          color: textColor,
+          ease: "power3.out"
+        }
+      );
       
       return () => {
         // Clean up animations
         gsap.killTweensOf(spans);
-        ScrollTrigger.getAll().forEach(trigger => trigger.kill());
       };
     } catch (err) {
-      console.error("Error setting up GSAP animation:", err);
+      console.error("❌ Error setting up GSAP animation:", err);
     }
-  }, [revealTextContent, defaultText, textColor]); // Add textColor as dependency
+  }, [revealTextContent, defaultText, textColor]);
 
   // If component is loading, render a placeholder
   if (isLoading) {
-    console.log("RevealText is loading");
+    console.log("⏳ RevealText is loading");
     return (
       <div 
         className="w-full py-24 relative z-20" 
@@ -222,12 +200,12 @@ const RevealText = ({
   }
 
   if (error) {
-    console.error("Error loading reveal text:", error);
+    console.error("❌ Error loading reveal text:", error);
   }
 
   // Always render component, even with error
   const textToDisplay = revealTextContent?.fields.text || defaultText;
-  console.log("Rendering RevealText component with text:", textToDisplay);
+  console.log("🖥️ Rendering RevealText component with text:", textToDisplay);
 
   return (
     <>
