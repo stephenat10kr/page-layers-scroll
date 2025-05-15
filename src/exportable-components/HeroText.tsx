@@ -37,7 +37,6 @@ const HeroText: React.FC = () => {
             <div className="col-span-12 lg:col-span-5 flex flex-col items-center">
               <h2 className="title-sm text-white mb-0 text-center py-0">WELCOME TO</h2>
               <div className="flex justify-center items-center mt-12 w-full">
-                {/* Using fixed width with proper aspect ratio to ensure consistent display across browsers */}
                 <div className="w-[320px] md:w-[420px] lg:w-[520px] mx-auto">
                   <AspectRatio ratio={444/213} className="w-full">
                     <Logo />
@@ -78,6 +77,35 @@ const HeroText: React.FC = () => {
               </p>
             </div>
           </div>
+        </div>
+
+        {/* Extra spacing sections to reach 10 viewport heights total */}
+        <div className="min-h-screen flex flex-col justify-center items-center px-4 md:px-8 lg:px-12">
+          <h2 className="title-sm text-white mb-4 text-center opacity-80">Continue Scrolling</h2>
+        </div>
+        
+        <div className="min-h-screen flex flex-col justify-center items-center px-4 md:px-8 lg:px-12">
+          <h2 className="title-sm text-white mb-4 text-center opacity-70">Discover More</h2>
+        </div>
+        
+        <div className="min-h-screen flex flex-col justify-center items-center px-4 md:px-8 lg:px-12">
+          <h2 className="title-sm text-white mb-4 text-center opacity-60">Keep Exploring</h2>
+        </div>
+        
+        <div className="min-h-screen flex flex-col justify-center items-center px-4 md:px-8 lg:px-12">
+          <h2 className="title-sm text-white mb-4 text-center opacity-50">Almost There</h2>
+        </div>
+        
+        <div className="min-h-screen flex flex-col justify-center items-center px-4 md:px-8 lg:px-12">
+          <h2 className="title-sm text-white mb-4 text-center opacity-40">Journey Continues</h2>
+        </div>
+        
+        <div className="min-h-screen flex flex-col justify-center items-center px-4 md:px-8 lg:px-12">
+          <h2 className="title-sm text-white mb-4 text-center opacity-30">Scroll Further</h2>
+        </div>
+        
+        <div className="min-h-screen flex flex-col justify-center items-center px-4 md:px-8 lg:px-12">
+          <h2 className="title-sm text-white mb-4 text-center opacity-20">Final Stretch</h2>
         </div>
       </div>
     </div>;
