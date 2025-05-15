@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -12,7 +11,7 @@ import { ContentfulRevealTextEntry } from "./types";
 // Register GSAP plugins
 gsap.registerPlugin(ScrollTrigger, TextPlugin);
 
-console.log("RevealText component file loaded");
+console.log("RevealText component file loaded and executing");
 
 interface RevealTextProps {
   // Contentful configuration
@@ -51,10 +50,16 @@ const RevealText = ({
   textColor = "#FFF4F1",
   textGradient = "linear-gradient(90deg, #FFB577 0%, #FFB577 100%)",
 }: RevealTextProps) => {
-  console.log("RevealText component rendering", { defaultText, backgroundColor });
+  console.log("RevealText component rendering with props:", { 
+    defaultText, 
+    backgroundColor, 
+    textColor, 
+    textGradient 
+  });
   
   const textRef = useRef<HTMLDivElement>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const componentRef = useRef<HTMLDivElement>(null);
   
   const contentfulClient = contentfulSpaceId && contentfulAccessToken 
     ? createContentfulClient(contentfulSpaceId, contentfulAccessToken) 
@@ -124,10 +129,16 @@ const RevealText = ({
   });
 
   useEffect(() => {
-    console.log("RevealText useEffect running", { textRef: !!textRef.current });
+    console.log("RevealText useEffect running", { 
+      textRef: !!textRef.current,
+      componentRef: !!componentRef.current 
+    });
     
     const text = textRef.current;
-    if (!text) return;
+    if (!text) {
+      console.warn("Text ref is not available yet");
+      return;
+    }
 
     // Get the text content
     const originalText = text.textContent || "";
@@ -144,43 +155,65 @@ const RevealText = ({
     text.innerHTML = formattedHTML;
     
     try {
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: text,
-          start: "top bottom-=100",
-          end: "bottom center",
-          scrub: 0.5,
-          markers: true, // Add markers for debugging
-          onEnter: () => console.log("ScrollTrigger entered"),
-          onLeave: () => console.log("ScrollTrigger left"),
-        }
-      });
+      // Make sure ScrollTrigger is registered before using it
+      if (!ScrollTrigger) {
+        console.error("ScrollTrigger is not available");
+        return;
+      }
       
+      // Check if the component is visible
+      const componentElement = componentRef.current;
+      if (componentElement) {
+        const rect = componentElement.getBoundingClientRect();
+        console.log("RevealText component position:", {
+          top: rect.top,
+          bottom: rect.bottom,
+          visible: rect.top < window.innerHeight && rect.bottom > 0
+        });
+      }
+
+      console.log("Setting up GSAP animation");
+      
+      // Simplify the animation for debugging
       const spans = text.querySelectorAll(".char");
       console.log(`Found ${spans.length} spans to animate`);
-      spans.forEach((span, i) => {
-        tl.to(span, {
-          color: "transparent",
-          ease: "power1.inOut",
-          duration: 0.1
-        }, i * 0.01);
+      
+      // Create a simple animation without ScrollTrigger first
+      gsap.to(spans, {
+        color: textColor,
+        stagger: 0.01,
+        duration: 0.5,
+        delay: 0.5
+      });
+      
+      // Try a simpler ScrollTrigger setup
+      ScrollTrigger.create({
+        trigger: text,
+        start: "top bottom",
+        onEnter: () => console.log("ScrollTrigger entered"),
+        onLeave: () => console.log("ScrollTrigger left"),
+        markers: true // Add markers for debugging
       });
       
       return () => {
-        tl.kill();
-        if (tl.scrollTrigger) {
-          tl.scrollTrigger.kill();
-        }
+        // Clean up animations
+        gsap.killTweensOf(spans);
+        ScrollTrigger.getAll().forEach(trigger => trigger.kill());
       };
     } catch (err) {
       console.error("Error setting up GSAP animation:", err);
     }
-  }, [revealTextContent, defaultText]); // Add defaultText as dependency
+  }, [revealTextContent, defaultText, textColor]); // Add textColor as dependency
 
+  // If component is loading, render a placeholder
   if (isLoading) {
     console.log("RevealText is loading");
     return (
-      <div className="w-full py-24" style={{ backgroundColor }}>
+      <div 
+        className="w-full py-24 relative z-20" 
+        style={{ backgroundColor }}
+        ref={componentRef}
+      >
         <div className="grid grid-cols-12 max-w-[90%] mx-auto">
           <div className="col-span-12 md:col-span-9 h-32 animate-pulse bg-gray-800 rounded" />
         </div>
@@ -199,9 +232,13 @@ const RevealText = ({
   return (
     <>
       <div 
-        className="w-full py-24 relative z-10" 
-        style={{ backgroundColor }}
+        className="w-full py-24 relative z-20 border-t border-b" 
+        style={{ 
+          backgroundColor,
+          borderColor: "rgba(255, 255, 255, 0.1)"
+        }}
         id="reveal-text-section"
+        ref={componentRef}
       >
         <div className="grid grid-cols-12 max-w-[90%] mx-auto">
           <div 
@@ -224,7 +261,14 @@ const RevealText = ({
             <Button 
               variant="default" 
               className={buttonClassName}
-              onClick={() => setIsFormOpen(true)}
+              onClick={() => {
+                console.log("Button clicked");
+                setIsFormOpen(true);
+              }}
+              style={{
+                backgroundColor: "#9b87f5",
+                color: "white"
+              }}
             >
               {buttonText}
             </Button>
