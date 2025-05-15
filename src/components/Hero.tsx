@@ -1,15 +1,22 @@
 
-import { HeroText } from "@/exportable-components";
+import { HeroText, Video } from "@/exportable-components";
 import { Button } from "@/components/ui/button";
 
 const Hero = () => {
   return (
     <div className="min-h-screen relative overflow-hidden bg-gradient-to-b from-slate-900 to-slate-800">
-      {/* HeroText component from exportable-components */}
-      <HeroText />
+      {/* Video component as background */}
+      <div className="absolute inset-0 w-full h-full">
+        <Video />
+      </div>
+      
+      {/* HeroText component overlaid on top with z-index */}
+      <div className="relative z-10">
+        <HeroText />
+      </div>
       
       {/* Scroll down indicator */}
-      <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
+      <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce z-10">
         <svg 
           className="w-10 h-10 mx-auto text-white opacity-70" 
           fill="none" 
