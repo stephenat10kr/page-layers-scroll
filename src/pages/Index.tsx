@@ -4,6 +4,7 @@ import Hero from "@/components/Hero";
 import ScrollSection from "@/components/ScrollSection";
 import Footer from "@/components/Footer";
 import AnimatedBackground from "@/components/AnimatedBackground";
+import { RevealText } from "@/exportable-components";
 
 const Index = () => {
   const [activeSection, setActiveSection] = useState(0);
@@ -98,6 +99,15 @@ const Index = () => {
     <div className="min-h-screen flex flex-col">
       {/* Normal scrolling section at top with HeroText integration */}
       <Hero />
+      
+      {/* RevealText component between Hero and animated sections */}
+      <RevealText
+        defaultText="Scroll down to discover more about our immersive experiences and interactive stories."
+        buttonText="JOIN OUR COMMUNITY"
+        backgroundColor="#1A1F2C"
+        textColor="#FFFFFF"
+        textGradient="linear-gradient(90deg, #9b87f5 0%, #7E69AB 100%)"
+      />
       
       {/* Scroll-jacked section - 400vh for four 100vh transition segments */}
       <div 
