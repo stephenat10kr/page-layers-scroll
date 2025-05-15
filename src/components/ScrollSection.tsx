@@ -1,8 +1,7 @@
 
-import { useRef } from "react";
-import { cn } from "@/lib/utils";
+import React from 'react';
 
-interface SectionProps {
+interface ScrollSectionProps {
   section: {
     id: string;
     title: string;
@@ -13,56 +12,38 @@ interface SectionProps {
   activeIndex: number;
 }
 
-const ScrollSection = ({ section, isActive, index, activeIndex }: SectionProps) => {
-  const sectionRef = useRef<HTMLDivElement>(null);
-
-  // Calculate the offset based on how far we are from the active section
-  const offset = index - activeIndex;
-  
-  // Only visible when it's the active section or the next/previous section
-  const isVisible = offset >= -1 && offset <= 1;
-  
-  // Calculate opacity and transform based on the offset
-  let opacity = 1;
-  let transform = "translateX(0)";
-  
-  if (offset > 0) {
-    // Next section(s) - changing opacity from 0.2 to 0
-    opacity = 0;
-    transform = "translateX(50%)";
-  } else if (offset < 0) {
-    // Previous section(s)
-    opacity = 0;
-    transform = "translateX(-50%)";
-  }
-
-  // Section 4 (index 3) should be invisible and have no content
+const ScrollSection: React.FC<ScrollSectionProps> = ({ 
+  section, 
+  isActive, 
+  index, 
+  activeIndex 
+}) => {
+  // Section 4 is a dummy/proxy section for animation, render nothing
   if (index === 3) {
-    return null; // Don't render anything for section 4
+    return null;
   }
 
+  const isVisible = isActive || index === activeIndex + 1 || index === activeIndex - 1;
+  
+  const getTransformStyles = () => {
+    if (!isActive) {
+      if (index < activeIndex) {
+        return { transform: 'translate3d(-100vw, 0, 0) scale(0.8)', opacity: 0 };
+      } else if (index > activeIndex) {
+        return { transform: 'translate3d(100vw, 0, 0) scale(0.8)', opacity: 0 };
+      }
+    }
+    return { transform: 'translate3d(0, 0, 0) scale(1)', opacity: 1 };
+  };
+  
   return (
     <div 
-      ref={sectionRef}
-      className={cn(
-        "absolute inset-0 w-full h-full flex items-center justify-center transition-all duration-1000 ease-in-out",
-        isVisible ? "" : "hidden"
-      )}
-      style={{ 
-        opacity,
-        transform
-      }}
+      className={`absolute inset-0 w-full h-full flex items-center justify-center transition-all duration-1000 ease-in-out ${isVisible ? 'pointer-events-auto' : 'pointer-events-none'}`}
+      style={getTransformStyles()}
     >
-      <div className="max-w-3xl mx-auto text-center p-8 bg-white/90 backdrop-blur-sm rounded-xl shadow-xl">
-        <h2 className="text-4xl font-bold mb-4">{section.title}</h2>
-        <p className="text-xl">{section.description}</p>
-        
-        <div className="mt-8 p-6 rounded-lg bg-slate-50">
-          <p className="text-slate-600">
-            This is section {index + 1} of our scroll-jacked experience. As you scroll, 
-            the background stays fixed while the content animates smoothly between sections.
-          </p>
-        </div>
+      <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 w-full max-w-4xl mx-4 shadow-2xl transform transition-all duration-1000">
+        <h2 className="text-4xl font-bold mb-4 text-white">{section.title}</h2>
+        <p className="text-xl text-white/90">{section.description}</p>
       </div>
     </div>
   );

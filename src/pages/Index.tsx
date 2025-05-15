@@ -29,8 +29,8 @@ const Index = () => {
     },
     {
       id: "section4",
-      title: "Section Four",
-      description: "A new dimension to our scroll experience with enhanced visuals."
+      title: "",
+      description: ""
     }
   ];
 
@@ -96,7 +96,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Normal scrolling section at top */}
+      {/* Normal scrolling section at top with HeroText integration */}
       <Hero />
       
       {/* Scroll-jacked section - 400vh for four 100vh transition segments */}
@@ -104,7 +104,7 @@ const Index = () => {
         ref={scrollContainerRef}
         className="h-[400vh] relative"
       >
-        <div className="sticky top-0 h-screen overflow-hidden flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
+        <div className="sticky top-0 h-screen overflow-hidden flex items-center justify-center bg-gradient-to-br from-slate-900 to-slate-800">
           {/* WebGL animated background */}
           <AnimatedBackground 
             scrollY={scrollY} 
@@ -117,15 +117,15 @@ const Index = () => {
           <div className="absolute inset-0 w-full h-full opacity-20 pointer-events-none">
             <div className="absolute inset-0 w-full h-full" 
                  style={{ 
-                   backgroundImage: `radial-gradient(circle at 25px 25px, rgba(0,0,0,0.2) 2%, transparent 0%), 
-                                     radial-gradient(circle at 75px 75px, rgba(0,0,0,0.2) 2%, transparent 0%)`,
+                   backgroundImage: `radial-gradient(circle at 25px 25px, rgba(255,255,255,0.1) 2%, transparent 0%), 
+                                     radial-gradient(circle at 75px 75px, rgba(255,255,255,0.1) 2%, transparent 0%)`,
                    backgroundSize: "100px 100px"
                  }}>
             </div>
             <div className="absolute inset-0 w-full h-full" 
                  style={{
-                   backgroundImage: `linear-gradient(45deg, rgba(30,41,59,0.1) 25%, transparent 25%, transparent 50%, 
-                                    rgba(30,41,59,0.1) 50%, rgba(30,41,59,0.1) 75%, transparent 75%, transparent)`,
+                   backgroundImage: `linear-gradient(45deg, rgba(255,255,255,0.05) 25%, transparent 25%, transparent 50%, 
+                                    rgba(255,255,255,0.05) 50%, rgba(255,255,255,0.05) 75%, transparent 75%, transparent)`,
                    backgroundSize: "60px 60px"
                  }}>
             </div>
