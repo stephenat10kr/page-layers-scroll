@@ -3,6 +3,7 @@
 export { default as Video } from './Video';
 export { default as HeroText } from './HeroText';
 export { default as StickyVideo } from './StickyVideo';
+export { default as ScrubStickyVideo } from './ScrubStickyVideo';
 
 // Supporting components
 export { default as ScrollVideo } from './ScrollVideo';
