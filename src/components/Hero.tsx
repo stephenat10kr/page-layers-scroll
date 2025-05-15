@@ -1,13 +1,14 @@
 
-import { HeroText, Video } from "@/exportable-components";
+import { HeroText } from "@/exportable-components";
+import StickyVideo from "@/exportable-components/StickyVideo";
 import { Button } from "@/components/ui/button";
 
 const Hero = () => {
   return (
     <div className="min-h-screen relative overflow-hidden bg-gradient-to-b from-slate-900 to-slate-800">
-      {/* Video component as background */}
+      {/* StickyVideo component as background */}
       <div className="absolute inset-0 w-full h-full">
-        <Video />
+        <StickyVideo />
       </div>
       
       {/* HeroText component overlaid on top with z-index */}
