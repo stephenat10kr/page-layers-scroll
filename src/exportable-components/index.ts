@@ -19,3 +19,5 @@ export { useIsMobile } from './use-mobile';
 
 // Export types
 export * from './types';
+
+console.log("Exportable components index file loaded, with RevealText exported");

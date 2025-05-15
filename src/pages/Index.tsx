@@ -1,10 +1,11 @@
-
 import { useEffect, useRef, useState } from "react";
 import Hero from "@/components/Hero";
 import ScrollSection from "@/components/ScrollSection";
 import Footer from "@/components/Footer";
 import AnimatedBackground from "@/components/AnimatedBackground";
 import { RevealText } from "@/exportable-components";
+
+console.log("Index page loaded, RevealText imported");
 
 const Index = () => {
   const [activeSection, setActiveSection] = useState(0);
@@ -35,6 +36,8 @@ const Index = () => {
     }
   ];
 
+  console.log("Rendering Index component with RevealText");
+  
   useEffect(() => {
     const handleScroll = () => {
       if (!scrollContainerRef.current) return;

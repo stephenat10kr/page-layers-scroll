@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -8,7 +9,10 @@ import ExportableForm from "./Form";
 import { createContentfulClient } from "./contentfulClient";
 import { ContentfulRevealTextEntry } from "./types";
 
+// Register GSAP plugins
 gsap.registerPlugin(ScrollTrigger, TextPlugin);
+
+console.log("RevealText component file loaded");
 
 interface RevealTextProps {
   // Contentful configuration
@@ -47,6 +51,8 @@ const RevealText = ({
   textColor = "#FFF4F1",
   textGradient = "linear-gradient(90deg, #FFB577 0%, #FFB577 100%)",
 }: RevealTextProps) => {
+  console.log("RevealText component rendering", { defaultText, backgroundColor });
+  
   const textRef = useRef<HTMLDivElement>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   
@@ -118,11 +124,14 @@ const RevealText = ({
   });
 
   useEffect(() => {
+    console.log("RevealText useEffect running", { textRef: !!textRef.current });
+    
     const text = textRef.current;
     if (!text) return;
 
     // Get the text content
     const originalText = text.textContent || "";
+    console.log("Original text content:", originalText);
 
     // Split text into words
     const words = originalText.split(" ");
@@ -134,32 +143,42 @@ const RevealText = ({
     }).join("");
     text.innerHTML = formattedHTML;
     
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: text,
-        start: "top bottom-=100",
-        end: "bottom center",
-        scrub: 0.5,
-        markers: false
-      }
-    });
-    
-    const spans = text.querySelectorAll(".char");
-    console.log(`Found ${spans.length} spans to animate`);
-    spans.forEach((span, i) => {
-      tl.to(span, {
-        color: "transparent",
-        ease: "power1.inOut",
-        duration: 0.1
-      }, i * 0.01);
-    });
-    
-    return () => {
-      tl.kill();
-    };
-  }, [revealTextContent]);
+    try {
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: text,
+          start: "top bottom-=100",
+          end: "bottom center",
+          scrub: 0.5,
+          markers: true, // Add markers for debugging
+          onEnter: () => console.log("ScrollTrigger entered"),
+          onLeave: () => console.log("ScrollTrigger left"),
+        }
+      });
+      
+      const spans = text.querySelectorAll(".char");
+      console.log(`Found ${spans.length} spans to animate`);
+      spans.forEach((span, i) => {
+        tl.to(span, {
+          color: "transparent",
+          ease: "power1.inOut",
+          duration: 0.1
+        }, i * 0.01);
+      });
+      
+      return () => {
+        tl.kill();
+        if (tl.scrollTrigger) {
+          tl.scrollTrigger.kill();
+        }
+      };
+    } catch (err) {
+      console.error("Error setting up GSAP animation:", err);
+    }
+  }, [revealTextContent, defaultText]); // Add defaultText as dependency
 
   if (isLoading) {
+    console.log("RevealText is loading");
     return (
       <div className="w-full py-24" style={{ backgroundColor }}>
         <div className="grid grid-cols-12 max-w-[90%] mx-auto">
@@ -173,24 +192,33 @@ const RevealText = ({
     console.error("Error loading reveal text:", error);
   }
 
+  // Always render component, even with error
+  const textToDisplay = revealTextContent?.fields.text || defaultText;
+  console.log("Rendering RevealText component with text:", textToDisplay);
+
   return (
     <>
-      <div className="w-full py-24" style={{ backgroundColor }}>
+      <div 
+        className="w-full py-24 relative z-10" 
+        style={{ backgroundColor }}
+        id="reveal-text-section"
+      >
         <div className="grid grid-cols-12 max-w-[90%] mx-auto">
           <div 
             ref={textRef} 
-            className="title-md col-span-12 md:col-span-9 mb-8" 
+            className="title-md col-span-12 md:col-span-9 mb-8 text-4xl font-bold" 
             style={{
               color: textColor,
               background: textGradient,
               WebkitBackgroundClip: "text",
               backgroundClip: "text",
+              WebkitTextFillColor: "transparent",
               lineHeight: "1.2",
               whiteSpace: "pre-wrap",
               wordBreak: "normal"
             }}
           >
-            {revealTextContent?.fields.text || defaultText}
+            {textToDisplay}
           </div>
           <div className="col-span-12 md:col-span-9">
             <Button 
